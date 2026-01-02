@@ -1,0 +1,16 @@
+<div class="sidebar-container">
+  <div class="user-profile mb-3 text-center p-3 surface-card border-round">
+    <p-avatar icon="pi pi-user" styleClass="mr-2" size="xlarge" shape="circle"
+              [style]="{'background-color': '#2196F3', 'color': '#ffffff'}"></p-avatar>
+    <div class="mt-2">
+      <span class="font-bold text-xl block text-900">Witaj, Piotr!</span>
+      <span class="text-sm text-500">Administrator</span>
+    </div>
+  </div>
+
+  <div class="clock-section mb-3 p-2 text-center text-primary font-bold surface-overlay border-round shadow-1">
+    <i class="pi pi-clock mr-2"></i> {{ currentTime | date: 'HH:mm:ss' }}
+  </div>
+
+  <p-menu [model]="items" styleClass="w-full border-none"></p-menu>
+</div>

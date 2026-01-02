@@ -1,0 +1,23 @@
+.layout-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--surface-ground);
+}
+
+.layout-sidebar {
+  width: 280px;
+  height: 100%;
+  background-color: var(--surface-overlay);
+  border-right: 1px solid var(--surface-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-content {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 2rem;
+}
