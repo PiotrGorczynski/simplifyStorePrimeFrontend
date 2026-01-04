@@ -1,16 +1,21 @@
-<div class="sidebar-container">
-  <div class="user-profile mb-3 text-center p-3 surface-card border-round">
-    <p-avatar icon="pi pi-user" styleClass="mr-2" size="xlarge" shape="circle"
-              [style]="{'background-color': '#2196F3', 'color': '#ffffff'}"></p-avatar>
-    <div class="mt-2">
-      <span class="font-bold text-xl block text-900">Witaj, Piotr!</span>
-      <span class="text-sm text-500">Administrator</span>
+<div class="sidebar-container flex flex-column h-full">
+  <div class="header-section p-3">
+    <div class="user-profile text-center p-3 surface-card border-round shadow-1 mb-3">
+      <p-avatar icon="pi pi-user" size="xlarge" shape="circle"
+                [style]="{'background-color': '#2196F3', 'color': '#ffffff'}"></p-avatar>
+      <div class="mt-2">
+        <span class="font-bold text-xl block text-900">Welcome, Piotr!</span>
+        <span class="text-xs text-500 font-medium uppercase">Administrator</span>
+      </div>
+    </div>
+    <div class="clock-section p-2 font-bold surface-overlay border-round shadow-1 mb-2">
+      <i class="pi pi-clock mr-2"></i> {{ currentTime | date: 'HH:mm:ss' }}
+    </div>
+    <div class="date-mini p-2 font-bold surface-overlay border-round shadow-1">
+      <i class="pi pi-calendar mr-2"></i> {{ currentTime | date: 'dd-MM-yyyy' }}
     </div>
   </div>
-
-  <div class="clock-section mb-3 p-2 text-center text-primary font-bold surface-overlay border-round shadow-1">
-    <i class="pi pi-clock mr-2"></i> {{ currentTime | date: 'HH:mm:ss' }}
+  <div class="menu-section flex-grow-1 px-3">
+    <p-menu [model]="items" styleClass="w-full border-none bg-transparent"></p-menu>
   </div>
-
-  <p-menu [model]="items" styleClass="w-full border-none"></p-menu>
 </div>

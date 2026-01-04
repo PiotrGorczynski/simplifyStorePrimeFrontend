@@ -1,15 +1,49 @@
 .dashboard-container {
-  background-color: var(--surface-ground);
-  min-height: 100%;
+  background-color: #f1f5f9;
+  padding: 1rem 2rem !important;
+  min-height: 100vh;
 }
 
 .sticky-panel {
   position: sticky;
   top: 1rem;
   z-index: 10;
+  align-self: stretch;
 }
 
 ::ng-deep .p-datatable-wrapper {
   max-height: calc(100vh - 250px);
   overflow-y: auto;
+}
+
+::ng-deep .operations-card {
+  .p-card-body {
+    padding: 0 1.25rem 1rem 1.25rem !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .p-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    flex-grow: 1;
+    padding-top: 0 !important;
+  }
+
+  .export-section {
+    .p-button.p-button-icon-only {
+      width: 2.5rem;
+      height: 2.5rem;
+      .p-button-icon {
+        font-size: 1.4rem !important;
+      }
+    }
+  }
+
+  .border-bottom-1 {
+    border-bottom: 1px solid var(--surface-border) !important;
+  }
 }
