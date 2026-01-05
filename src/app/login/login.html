@@ -1,0 +1,45 @@
+<div class="login-container flex min-h-screen surface-ground">
+  <div class="login-form-section flex align-items-start justify-content-center col-12 lg:col-5 pt-8 px-5 lg:px-8 bg-white shadow-7 relative z-2">
+    <div class="w-full mt-1" style="max-width: 400px;">
+
+      <div class="flex justify-content-center mt-1 mb-1">
+        <img src="logo.png" alt="Simplify Store Prime" class="h-auto" style="max-width: 300px;">
+      </div>
+
+      <div class="flex flex-column gap-4">
+        <div class="flex flex-column gap-2">
+          <label for="email" class="font-bold text-900">Email address</label>
+          <input pInputText id="email" type="email" placeholder="Enter your email" class="w-full p-inputtext-lg" />
+        </div>
+
+        <div class="flex flex-column gap-2 login-password-field">
+          <label for="password" class="font-bold text-900">Password</label>
+          <p-password
+            id="password"
+            [(ngModel)]="passwordValue"
+            [toggleMask]="true"
+            [feedback]="false"
+            placeholder="Enter your password"
+            styleClass="w-full"
+            inputStyleClass="w-full p-inputtext-lg">
+          </p-password>
+        </div>
+
+        <div class="flex justify-content-center">
+          <a class="font-bold no-underline text-primary cursor-pointer hover:underline transition-all custom-blue-link">Forgot password?</a>
+        </div>
+
+        <p-button label="Log In" styleClass="w-full p-button-lg shadow-2 custom-blue-button" (onClick)="onLogin()"></p-button>
+      </div>
+
+      <div class="mt-6 text-center text-600 font-medium">
+        Don't have an account? <a class="font-bold cursor-pointer text-primary no-underline hover:underline transition-all custom-blue-link">Sign up!</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-image-section hidden lg:block col-7 p-0 overflow-hidden relative z-1">
+    <img src="login-background.jpg" alt="Login Background" class="h-full w-full absolute top-0 left-0" style="object-fit: cover;">
+    <div class="absolute top-0 left-0 w-full h-full bg-black-alpha-10"></div>
+  </div>
+</div>

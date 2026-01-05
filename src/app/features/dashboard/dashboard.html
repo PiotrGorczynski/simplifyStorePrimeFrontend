@@ -1,59 +1,63 @@
-<div class="dashboard-container p-4">
-  <div class="grid align-items-start">
-    <div class="col-12 lg:col-9">
-      <p-card styleClass="shadow-2">
-        <p-table [value]="products" [rows]="15" [paginator]="true" responsiveLayout="scroll" styleClass="p-datatable-sm p-datatable-striped">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>ID</th>
-              <th>INFO</th>
-              <th>SALES ORDER</th>
-              <th>INVOICES</th>
-              <th>CATEGORY</th>
-              <th>AKCJE</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-product>
-            <tr>
-              <td>{{product.id}}</td>
-              <td>{{product.info}}</td>
-              <td>{{product.salesOrder}}</td>
-              <td>
-                <p-tag [value]="product.invoices" [severity]="product.invoices === 'yes' ? 'success' : 'danger'"></p-tag>
-              </td>
-              <td>{{product.category}}</td>
-              <td>
-                <p-button icon="pi pi-pencil" severity="info" [text]="true"></p-button>
-                <p-button icon="pi pi-trash" severity="danger" [text]="true"></p-button>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-card>
-    </div>
+<div class="flex min-h-screen">
+  <app-sidebar></app-sidebar>
+  <div class="dashboard-container p-5 pt-6 flex-grow-1 overflow-auto">
+    <div class="grid align-items-start">
+      <div class="col-12 lg:col-9">
+        <p-card styleClass="shadow-2">
+          <p-table [value]="products" [rows]="15" [paginator]="true" responsiveLayout="scroll" styleClass="p-datatable-sm p-datatable-striped">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>ID</th>
+                <th>INFO</th>
+                <th>SALES ORDER</th>
+                <th>INVOICES</th>
+                <th>CATEGORY</th>
+                <th>ACTIONS</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-product>
+              <tr>
+                <td>{{product.id}}</td>
+                <td>{{product.info}}</td>
+                <td>{{product.salesOrder}}</td>
+                <td>
+                  <p-tag [value]="product.invoices" [severity]="product.invoices === 'yes' ? 'success' : 'danger'"></p-tag>
+                </td>
+                <td>{{product.category}}</td>
+                <td>
+                  <p-button icon="pi pi-pencil" severity="info" [text]="true"></p-button>
+                  <p-button icon="pi pi-trash" severity="danger" [text]="true"></p-button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
 
-    <div class="col-12 lg:col-3 sticky-panel">
-      <p-card styleClass="h-full shadow-2 operations-card">
-        <div class="flex justify-content-center pt-0 pb-4 mb-3 border-bottom-1 surface-border">
-          <img src="logo.png" alt="Simplify Store Prime" class="h-auto w-full px-1" style="max-width: 280px;">
-        </div>
-        <div class="flex flex-column gap-3 justify-content-start">
-          <p-button label="SHOW" icon="pi pi-eye" styleClass="w-full"></p-button>
-          <p-button label="INSERT" icon="pi pi-plus" severity="success" styleClass="w-full"></p-button>
-          <p-button label="UPDATE" icon="pi pi-refresh" severity="warn" styleClass="w-full"></p-button>
-          <p-button label="DELETE" icon="pi pi-trash" severity="danger" styleClass="w-full"></p-button>
-        </div>
-        <div class="export-section mt-auto pt-4 border-top-1 surface-border">
-          <div class="text-xs font-bold text-500 mb-3 uppercase text-center tracking-wider">Export & System</div>
-          <div class="flex justify-content-between px-1">
-            <p-button icon="pi pi-file-excel" [text]="true" severity="secondary" pTooltip="XLSX"></p-button>
-            <p-button icon="pi pi-file-edit" [text]="true" severity="secondary" pTooltip="CSV"></p-button>
-            <p-button icon="pi pi-file" [text]="true" severity="secondary" pTooltip="XLS"></p-button>
-            <p-button icon="pi pi-code" [text]="true" severity="secondary" pTooltip="HTML"></p-button>
-            <p-button icon="pi pi-database" [text]="true" severity="secondary" pTooltip="JSON"></p-button> <p-button icon="pi pi-power-off" [text]="true" severity="danger" pTooltip="Exit"></p-button>
+      <div class="col-12 lg:col-3 sticky-panel">
+        <p-card styleClass="h-full shadow-2 operations-card">
+          <div class="flex justify-content-center pt-0 pb-4 mb-3 border-bottom-1 surface-border">
+            <img src="logo.png" alt="Simplify Store Prime" class="h-auto w-full px-1" style="max-width: 280px;">
           </div>
-        </div>
-      </p-card>
+          <div class="flex flex-column gap-3 justify-content-start">
+            <p-button label="SHOW" icon="pi pi-eye" styleClass="w-full"></p-button>
+            <p-button label="INSERT" icon="pi pi-plus" severity="success" styleClass="w-full"></p-button>
+            <p-button label="UPDATE" icon="pi pi-refresh" severity="warn" styleClass="w-full"></p-button>
+            <p-button label="DELETE" icon="pi pi-trash" severity="danger" styleClass="w-full"></p-button>
+          </div>
+          <div class="export-section mt-auto pt-4 border-top-1 surface-border">
+            <div class="text-xs font-bold text-500 mb-3 uppercase text-center tracking-wider">Export & System</div>
+            <div class="flex justify-content-between px-1">
+              <p-button icon="pi pi-file-excel" [text]="true" severity="secondary" pTooltip="XLSX"></p-button>
+              <p-button icon="pi pi-file-edit" [text]="true" severity="secondary" pTooltip="CSV"></p-button>
+              <p-button icon="pi pi-file" [text]="true" severity="secondary" pTooltip="XLS"></p-button>
+              <p-button icon="pi pi-code" [text]="true" severity="secondary" pTooltip="HTML"></p-button>
+              <p-button icon="pi pi-database" [text]="true" severity="secondary" pTooltip="JSON"></p-button>
+              <p-button icon="pi pi-power-off" [text]="true" severity="danger" pTooltip="Exit" (onClick)="onLogout()"></p-button>
+            </div>
+          </div>
+        </p-card>
+      </div>
     </div>
   </div>
 </div>
