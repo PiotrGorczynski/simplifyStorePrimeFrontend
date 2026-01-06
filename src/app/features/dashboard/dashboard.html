@@ -1,63 +1,130 @@
-<div class="flex min-h-screen">
+<div class="flex min-h-screen overflow-hidden">
   <app-sidebar></app-sidebar>
-  <div class="dashboard-container p-5 pt-6 flex-grow-1 overflow-auto">
-    <div class="grid align-items-start">
-      <div class="col-12 lg:col-9">
-        <p-card styleClass="shadow-2">
-          <p-table [value]="products" [rows]="15" [paginator]="true" responsiveLayout="scroll" styleClass="p-datatable-sm p-datatable-striped">
+
+  <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
+    <div class="grid align-items-stretch m-0 g-2">
+
+      <div class="col-12 lg:col-10 p-2">
+        <p-card styleClass="shadow-2 border-round-xl m-0 h-full">
+          <p-table [value]="products" [rows]="20" [paginator]="true" styleClass="p-datatable-sm p-datatable-striped">
             <ng-template pTemplate="header">
               <tr>
-                <th>ID</th>
-                <th>INFO</th>
-                <th>SALES ORDER</th>
-                <th>INVOICES</th>
-                <th>CATEGORY</th>
-                <th>ACTIONS</th>
+                <th class="text-xs">ID</th>
+                <th class="text-xs">INFO</th>
+                <th class="text-xs">SALES ORDER</th>
+                <th class="text-xs">INVOICE</th>
+                <th class="text-xs">PAYMENT HISTORY</th>
+                <th class="text-xs">COMMUNICATION</th>
+                <th class="text-xs">CATEGORY</th>
+                <th class="text-xs">FEEDBACK</th>
+                <th class="text-xs">NOTES</th>
+                <th class="text-xs">SUPPORT</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-product>
-              <tr>
+              <tr class="text-xs">
                 <td>{{product.id}}</td>
-                <td>{{product.info}}</td>
+                <td class="font-bold text-blue-600">{{product.info}}</td>
                 <td>{{product.salesOrder}}</td>
-                <td>
-                  <p-tag [value]="product.invoices" [severity]="product.invoices === 'yes' ? 'success' : 'danger'"></p-tag>
-                </td>
+                <td><p-tag [value]="product.invoices" [severity]="product.invoices === 'yes' ? 'success' : 'danger'"></p-tag></td>
+                <td><p-tag [value]="product.paymentHistory" [severity]="product.paymentHistory === 'yes' ? 'info' : 'warn'"></p-tag></td>
+                <td>{{product.communication}}</td>
                 <td>{{product.category}}</td>
-                <td>
-                  <p-button icon="pi pi-pencil" severity="info" [text]="true"></p-button>
-                  <p-button icon="pi pi-trash" severity="danger" [text]="true"></p-button>
-                </td>
+                <td>{{product.feedback}}</td>
+                <td>{{product.notes}}</td>
+                <td>{{product.supportRequests}}</td>
               </tr>
             </ng-template>
           </p-table>
         </p-card>
       </div>
 
-      <div class="col-12 lg:col-3 sticky-panel">
-        <p-card styleClass="h-full shadow-2 operations-card">
-          <div class="flex justify-content-center pt-0 pb-4 mb-3 border-bottom-1 surface-border">
-            <img src="logo.png" alt="Simplify Store Prime" class="h-auto w-full px-1" style="max-width: 280px;">
+      <div class="col-12 lg:col-2 p-2">
+        <p-card styleClass="shadow-2 border-round-xl m-0 h-full operations-card">
+          <div class="flex justify-content-center pt-4 mb-2">
+            <img src="logo.png" alt="Logo" class="main-logo">
           </div>
-          <div class="flex flex-column gap-3 justify-content-start">
-            <p-button label="SHOW" icon="pi pi-eye" styleClass="w-full"></p-button>
-            <p-button label="INSERT" icon="pi pi-plus" severity="success" styleClass="w-full"></p-button>
-            <p-button label="UPDATE" icon="pi pi-refresh" severity="warn" styleClass="w-full"></p-button>
-            <p-button label="DELETE" icon="pi pi-trash" severity="danger" styleClass="w-full"></p-button>
+
+          <div class="action-buttons-wrapper">
+            <div class="flex flex-column gap-3 action-buttons">
+              <p-button label="SHOW" icon="pi pi-eye" styleClass="w-full"></p-button>
+              <p-button label="INSERT" icon="pi pi-plus" severity="success" styleClass="w-full" (onClick)="showDialog()"></p-button>
+              <p-button label="UPDATE" icon="pi pi-refresh" severity="warn" styleClass="w-full"></p-button>
+              <p-button label="DELETE" icon="pi pi-trash" severity="danger" styleClass="w-full" (onClick)="deleteProduct(0)"></p-button>
+            </div>
           </div>
-          <div class="export-section mt-auto pt-4 border-top-1 surface-border">
-            <div class="text-xs font-bold text-500 mb-3 uppercase text-center tracking-wider">Export & System</div>
-            <div class="flex justify-content-between px-1">
-              <p-button icon="pi pi-file-excel" [text]="true" severity="secondary" pTooltip="XLSX"></p-button>
-              <p-button icon="pi pi-file-edit" [text]="true" severity="secondary" pTooltip="CSV"></p-button>
-              <p-button icon="pi pi-file" [text]="true" severity="secondary" pTooltip="XLS"></p-button>
-              <p-button icon="pi pi-code" [text]="true" severity="secondary" pTooltip="HTML"></p-button>
-              <p-button icon="pi pi-database" [text]="true" severity="secondary" pTooltip="JSON"></p-button>
-              <p-button icon="pi pi-power-off" [text]="true" severity="danger" pTooltip="Exit" (onClick)="onLogout()"></p-button>
+
+          <div class="export-section">
+            <div class="text-xs font-bold text-400 mb-3 uppercase text-center tracking-wider">Export & System</div>
+            <div class="export-grid">
+              <p-button icon="pi pi-file-excel" [text]="true" pTooltip="XLSX"></p-button>
+              <p-button icon="pi pi-file-edit" [text]="true" pTooltip="CSV"></p-button>
+              <p-button icon="pi pi-file" [text]="true" pTooltip="XLS"></p-button>
+              <p-button icon="pi pi-code" [text]="true" pTooltip="HTML"></p-button>
+              <p-button icon="pi pi-database" [text]="true" pTooltip="JSON"></p-button>
+              <p-button icon="pi pi-power-off" [text]="true" pTooltip="Exit" styleClass="logout-btn" (onClick)="onLogout()"></p-button>
             </div>
           </div>
         </p-card>
       </div>
     </div>
   </div>
+
+  <p-dialog header="Add New Customer Entry" [(visible)]="displayDialog" [modal]="true" [style]="{width: '600px'}" styleClass="custom-dialog">
+    <ng-template pTemplate="content">
+      <div class="dialog-form-container">
+        <div class="field-row">
+          <i class="pi pi-info-circle field-icon"></i>
+          <label class="field-label">INFO</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.info" placeholder="New Info" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-shopping-cart field-icon"></i>
+          <label class="field-label">SALES ORDERS</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.salesOrder" placeholder="Service" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-file field-icon"></i>
+          <label class="field-label">INVOICES</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.invoices" placeholder="Yes/No" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-credit-card field-icon"></i>
+          <label class="field-label">PAYMENT H.</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.paymentHistory" placeholder="Yes/No" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-envelope field-icon"></i>
+          <label class="field-label">EMAIL</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.communication" placeholder="Contact email" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-tag field-icon"></i>
+          <label class="field-label">CATEGORY</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.category" placeholder="Retail chains" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-comment field-icon"></i>
+          <label class="field-label">FEEDBACK</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.feedback" placeholder="Customer opinion" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-pencil field-icon"></i>
+          <label class="field-label">NOTES</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.notes" placeholder="Additional notes" /></div>
+        </div>
+        <div class="field-row">
+          <i class="pi pi-question-circle field-icon"></i>
+          <label class="field-label">SUPPORT</label>
+          <div class="field-input"><input type="text" pInputText [(ngModel)]="newProduct.supportRequests" placeholder="Request count" /></div>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end gap-2">
+        <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="displayDialog = false"></p-button>
+        <p-button label="Save Entry" icon="pi pi-check" severity="success" (onClick)="saveProduct()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
 </div>
