@@ -101,10 +101,13 @@
   }
 
   .custom-dialog {
-    .p-dialog-header { padding: 1.2rem !important; }
+    .p-dialog-header {
+      background: #7c4dff !important;
+      color: white !important;
+    }
     .p-dialog-content {
+      background-color: #f0f0ff !important;
       padding: 1.5rem !important;
-      background-color: #f8faff !important;
     }
 
     .field-row {
@@ -113,14 +116,16 @@
       gap: 1.5rem;
       padding: 0.6rem 0;
 
-      .field-icon { font-size: 1.4rem; color: #94a3b8; width: 30px; text-align: center; }
-      .field-label { width: 120px; font-weight: 700; font-size: 0.8rem; color: #475569; text-transform: uppercase; }
+      .field-icon { color: #7c4dff; font-size: 1.5rem; width: 30px; text-align: center; }
+      .field-label { width: 130px; font-weight: 800; color: #4a148c; text-transform: uppercase; font-size: 0.85rem; }
+
       .field-input {
         flex: 1;
-        input, .p-select { width: 100% !important; border-radius: 8px !important; border: 1px solid #e2e8f0 !important; }
-        input { padding: 0.65rem !important; }
-        .p-select { .p-select-label { padding: 0.65rem !important; } }
+        .p-select, input { width: 100% !important; border-radius: 8px !important; border: 1px solid #7c4dff55 !important; }
+        .p-select .p-select-label { padding: 0.65rem !important; }
       }
     }
+    .p-dialog-footer { background: #f0f0ff !important; border-top: 1px solid #e0e0ff !important; }
   }
+
 }
