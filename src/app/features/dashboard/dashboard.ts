@@ -318,16 +318,34 @@ export class DashboardComponent implements OnInit {
     ];
   }
   showDialog() {
-    this.newProduct = { id: null, info: '', salesOrder: '', invoices: 'no', category: '' };
+    this.newProduct = {id: 0, info: '', salesOrder: '', invoices: 'no', paymentHistory: 'no', communication: '', category: '',
+      feedback: '', notes: '', supportRequests: 'None'};
     this.displayDialog = true;
   }
 
   saveProduct() {
-    if (this.newProduct.info) {
+    if (this.isFormValid()) {
       const nextId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
-      this.products = [...this.products, { ...this.newProduct, id: nextId }];
+
+      this.products = [...this.products,
+        { ...this.newProduct, id: nextId }
+      ];
+
+      console.log('Saved new customer: ', this.newProduct);
       this.displayDialog = false;
     }
+  }
+
+  closeDialog() {
+    this.displayDialog = false;
+  }
+
+  isFormValid(): boolean {
+    return !!(
+      this.newProduct.info &&
+      this.newProduct.salesOrder &&
+      this.newProduct.category
+    );
   }
 
   deleteProduct(id: number) {
