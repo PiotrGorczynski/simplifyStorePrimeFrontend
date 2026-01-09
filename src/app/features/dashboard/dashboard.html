@@ -1,12 +1,14 @@
 <div class="flex min-h-screen overflow-hidden">
   <app-sidebar></app-sidebar>
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
 
   <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
     <div class="grid align-items-stretch m-0 g-2">
 
       <div class="col-12 lg:col-10 p-2">
         <p-card styleClass="shadow-2 border-round-xl m-0 h-full">
-          <p-table [value]="products" [rows]="20" [paginator]="true" styleClass="p-datatable-sm p-datatable-striped">
+          <p-table [value]="products" [rows]="20" [paginator]="true" styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" [(selection)]="selectedCustomer" selectionMode="single" dataKey="id">
             <ng-template pTemplate="header">
               <tr>
                 <th class="text-xs">ID</th>
@@ -22,7 +24,7 @@
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-product>
-              <tr class="text-xs">
+              <tr class="text-xs" [pSelectableRow]="product">
                 <td>{{product.id}}</td>
                 <td class="font-bold text-blue-600">{{product.info}}</td>
                 <td>{{product.salesOrder}}</td>
@@ -47,10 +49,36 @@
 
           <div class="action-buttons-wrapper">
             <div class="flex flex-column gap-3 action-buttons">
-              <p-button label="SHOW" icon="pi pi-eye" styleClass="w-full"></p-button>
-              <p-button label="INSERT" icon="pi pi-plus" severity="success" styleClass="w-full" (onClick)="showDialog()"></p-button>
-              <p-button label="UPDATE" icon="pi pi-refresh" severity="warn" styleClass="w-full"></p-button>
-              <p-button label="DELETE" icon="pi pi-trash" severity="danger" styleClass="w-full" (onClick)="deleteProduct(0)"></p-button>
+              <p-button
+                label="SHOW"
+                icon="pi pi-eye"
+                styleClass="w-full"
+                (onClick)="onShowCustomer()">
+              </p-button>
+
+              <p-button
+                label="INSERT"
+                icon="pi pi-plus"
+                severity="success"
+                styleClass="w-full"
+                (onClick)="showDialog()">
+              </p-button>
+
+              <p-button
+                label="UPDATE"
+                icon="pi pi-refresh"
+                severity="warn"
+                styleClass="w-full"
+                (onClick)="showUpdateDialog()">
+              </p-button>
+
+              <p-button
+                label="DELETE"
+                icon="pi pi-trash"
+                severity="danger"
+                styleClass="w-full"
+                (onClick)="deleteProduct()">
+              </p-button>
             </div>
           </div>
 
@@ -70,74 +98,81 @@
     </div>
   </div>
 
-  <p-dialog header="Add New Customer Entry" [(visible)]="displayDialog" [modal]="true" [style]="{width: '600px'}" styleClass="custom-dialog">
+  <p-dialog [header]="getDialogHeader()" [(visible)]="displayDialog" [modal]="true" [style]="{width: '600px'}" styleClass="custom-dialog">
     <ng-template pTemplate="content">
       <div class="dialog-form-container">
         <div class="field-row">
           <i class="pi pi-info-circle field-icon"></i>
-          <label class="field-label">INFO</label>
+          <label class="field-label">INFO *</label>
           <div class="field-input">
-            <input type="text" pInputText [(ngModel)]="newProduct.info" placeholder="Customer name or ID" />
+            <input type="text" pInputText [(ngModel)]="newProduct.info" placeholder="Customer name or ID" class="w-full" />
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-shopping-cart field-icon"></i>
-          <label class="field-label">SALES ORDERS</label>
-          <div class="field-input"><p-select [(ngModel)]="newProduct.salesOrder" [options]="orderOptions" optionLabel="label" optionValue="value" placeholder="Select order type" styleClass="w-full"></p-select>
+          <label class="field-label">SALES ORDERS *</label>
+          <div class="field-input">
+            <p-select [(ngModel)]="newProduct.salesOrder" [options]="orderOptions" optionLabel="label" optionValue="value" placeholder="Select order type" styleClass="w-full"></p-select>
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-file field-icon"></i>
           <label class="field-label">INVOICES</label>
-          <div class="field-input"><p-select [(ngModel)]="newProduct.invoices" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
+          <div class="field-input">
+            <p-select [(ngModel)]="newProduct.invoices" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-credit-card field-icon"></i>
           <label class="field-label">PAYMENT H.</label>
-          <div class="field-input"><p-select [(ngModel)]="newProduct.paymentHistory" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
+          <div class="field-input">
+            <p-select [(ngModel)]="newProduct.paymentHistory" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-envelope field-icon"></i>
-          <label class="field-label">EMAIL</label>
+          <label class="field-label">EMAIL *</label>
           <div class="field-input">
-            <input type="email" pInputText [(ngModel)]="newProduct.communication" placeholder="customer@example.com" />
+            <input type="email" pInputText [(ngModel)]="newProduct.communication" placeholder="customer@example.com" class="w-full" />
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-tag field-icon"></i>
-          <label class="field-label">CATEGORY</label>
-          <div class="field-input"><p-select [(ngModel)]="newProduct.category" [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" styleClass="w-full"></p-select>
+          <label class="field-label">CATEGORY *</label>
+          <div class="field-input">
+            <p-select [(ngModel)]="newProduct.category" [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" styleClass="w-full"></p-select>
           </div>
         </div>
-        <div class="field-row">
+        <div class="field-row has-textarea">
           <i class="pi pi-comment field-icon"></i>
           <label class="field-label">FEEDBACK</label>
           <div class="field-input">
-          <textarea pInputTextarea [(ngModel)]="newProduct.feedback" placeholder="Customer feedback" rows="2" class="w-full"></textarea>
+            <textarea pInputTextarea [(ngModel)]="newProduct.feedback" placeholder="Customer feedback" rows="2" class="w-full"></textarea>
           </div>
         </div>
-        <div class="field-row">
+        <div class="field-row has-textarea">
           <i class="pi pi-pencil field-icon"></i>
           <label class="field-label">NOTES</label>
           <div class="field-input">
-          <textarea pInputTextarea [(ngModel)]="newProduct.notes" placeholder="Additional notes" rows="2" class="w-full"></textarea>
+            <textarea pInputTextarea [(ngModel)]="newProduct.notes" placeholder="Additional notes" rows="2" class="w-full"></textarea>
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-question-circle field-icon"></i>
           <label class="field-label">SUPPORT</label>
           <div class="field-input">
-            <input type="text" pInputText [(ngModel)]="newProduct.supportRequests" placeholder="e.g. None, 1 pending" />
+            <input type="text" pInputText [(ngModel)]="newProduct.supportRequests" placeholder="e.g. None, 1 pending" class="w-full" />
           </div>
+        </div>
+        <div class="text-xs text-500 mt-2">
+          * Required fields
         </div>
       </div>
     </ng-template>
     <ng-template pTemplate="footer">
       <div class="flex justify-content-end gap-2">
         <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
-        <p-button label="Save Entry" icon="pi pi-check" severity="success" (onClick)="saveProduct()" [disabled]="!isFormValid()"></p-button>
+        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveProduct()" [disabled]="!isFormValid()"></p-button>
       </div>
     </ng-template>
   </p-dialog>
