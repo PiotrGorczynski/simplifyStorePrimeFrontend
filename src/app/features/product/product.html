@@ -1,0 +1,203 @@
+<div class="flex min-h-screen overflow-hidden">
+  <app-sidebar></app-sidebar>
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
+    <div class="grid align-items-stretch m-0 g-2">
+
+      <div class="col-12 lg:col-10 p-2">
+        <p-card styleClass="shadow-2 border-round-xl m-0 h-full">
+          <p-table
+            [value]="products"
+            [rows]="20"
+            [paginator]="true"
+            styleClass="p-datatable-sm p-datatable-striped"
+            [rowHover]="true"
+            [(selection)]="selectedProduct"
+            selectionMode="single"
+            dataKey="id">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="text-xs">ID</th>
+                <th class="text-xs">NAME</th>
+                <th class="text-xs">CODE</th>
+                <th class="text-xs">CATEGORY</th>
+                <th class="text-xs">PRICE</th>
+                <th class="text-xs">STOCK</th>
+                <th class="text-xs">MIN QTY</th>
+                <th class="text-xs">DESCRIPTION</th>
+                <th class="text-xs">NOTES</th>
+                <th class="text-xs">ANOTHER</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-product>
+              <tr class="text-xs" [pSelectableRow]="product">
+                <td>{{product.id}}</td>
+                <td class="font-bold text-blue-600">{{product.name}}</td>
+                <td class="font-semibold">{{product.code}}</td>
+                <td><p-tag [value]="product.category" severity="info"></p-tag></td>
+                <td class="text-green-600 font-bold">${{product.price.toFixed(2)}}</td>
+                <td>
+                  <p-tag
+                    [value]="product.stock"
+                    [severity]="product.stock > 50 ? 'success' : product.stock > 10 ? 'warn' : 'danger'">
+                  </p-tag>
+                </td>
+                <td>{{product.minQuantity}}</td>
+                <td class="text-overflow-ellipsis">{{product.description}}</td>
+                <td>{{product.notes}}</td>
+                <td>{{product.another}}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
+
+      <div class="col-12 lg:col-2 p-2">
+        <p-card styleClass="shadow-2 border-round-xl m-0 h-full operations-card">
+          <div class="flex justify-content-center pt-4 mb-2">
+            <img src="logo.png" alt="Logo" class="main-logo">
+          </div>
+
+          <div class="action-buttons-wrapper">
+            <div class="flex flex-column gap-3 action-buttons">
+              <p-button
+                label="SHOW"
+                icon="pi pi-eye"
+                styleClass="w-full"
+                (onClick)="onShowProduct()">
+              </p-button>
+
+              <p-button
+                label="INSERT"
+                icon="pi pi-plus"
+                severity="success"
+                styleClass="w-full"
+                (onClick)="showDialog()">
+              </p-button>
+
+              <p-button
+                label="UPDATE"
+                icon="pi pi-refresh"
+                severity="warn"
+                styleClass="w-full"
+                (onClick)="showUpdateDialog()">
+              </p-button>
+
+              <p-button
+                label="DELETE"
+                icon="pi pi-trash"
+                severity="danger"
+                styleClass="w-full"
+                (onClick)="deleteProduct()">
+              </p-button>
+            </div>
+          </div>
+
+          <div class="export-section">
+            <div class="text-xs font-bold text-400 mb-3 uppercase text-center tracking-wider">Export & System</div>
+            <div class="export-grid">
+              <p-button icon="pi pi-file-excel" [text]="true" pTooltip="XLSX"></p-button>
+              <p-button icon="pi pi-file-edit" [text]="true" pTooltip="CSV"></p-button>
+              <p-button icon="pi pi-file" [text]="true" pTooltip="XLS"></p-button>
+              <p-button icon="pi pi-code" [text]="true" pTooltip="HTML"></p-button>
+              <p-button icon="pi pi-database" [text]="true" pTooltip="JSON"></p-button>
+              <p-button icon="pi pi-power-off" [text]="true" pTooltip="Exit" styleClass="logout-btn" (onClick)="onLogout()"></p-button>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog [header]="getDialogHeader()" [(visible)]="displayDialog" [modal]="true" [style]="{width: '700px'}" styleClass="custom-dialog">
+    <ng-template pTemplate="content">
+      <div class="dialog-form-container">
+        <div class="field-row">
+          <i class="pi pi-box field-icon"></i>
+          <label class="field-label">NAME *</label>
+          <div class="field-input">
+            <input type="text" pInputText [(ngModel)]="newProduct.name" placeholder="Product name" class="w-full" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <i class="pi pi-barcode field-icon"></i>
+          <label class="field-label">CODE *</label>
+          <div class="field-input">
+            <input type="text" pInputText [(ngModel)]="newProduct.code" placeholder="Product code" class="w-full" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <i class="pi pi-tag field-icon"></i>
+          <label class="field-label">CATEGORY *</label>
+          <div class="field-input">
+            <p-select [(ngModel)]="newProduct.category" [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" styleClass="w-full"></p-select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <i class="pi pi-dollar field-icon"></i>
+          <label class="field-label">PRICE *</label>
+          <div class="field-input">
+            <p-inputNumber [(ngModel)]="newProduct.price" mode="currency" currency="USD" locale="en-US" styleClass="w-full"></p-inputNumber>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <i class="pi pi-database field-icon"></i>
+          <label class="field-label">STOCK *</label>
+          <div class="field-input">
+            <p-inputNumber [(ngModel)]="newProduct.stock" [showButtons]="true" buttonLayout="horizontal" styleClass="w-full" [min]="0"></p-inputNumber>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <i class="pi pi-sort-numeric-down field-icon"></i>
+          <label class="field-label">MIN QTY *</label>
+          <div class="field-input">
+            <p-inputNumber [(ngModel)]="newProduct.minQuantity" [showButtons]="true" buttonLayout="horizontal" styleClass="w-full" [min]="1"></p-inputNumber>
+          </div>
+        </div>
+
+        <div class="field-row has-textarea">
+          <i class="pi pi-align-left field-icon"></i>
+          <label class="field-label">DESCRIPTION</label>
+          <div class="field-input">
+            <textarea pInputTextarea [(ngModel)]="newProduct.description" placeholder="Product description" rows="2" class="w-full"></textarea>
+          </div>
+        </div>
+
+        <div class="field-row has-textarea">
+          <i class="pi pi-pencil field-icon"></i>
+          <label class="field-label">NOTES</label>
+          <div class="field-input">
+            <textarea pInputTextarea [(ngModel)]="newProduct.notes" placeholder="Additional notes" rows="2" class="w-full"></textarea>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <i class="pi pi-info-circle field-icon"></i>
+          <label class="field-label">ANOTHER</label>
+          <div class="field-input">
+            <input type="text" pInputText [(ngModel)]="newProduct.another" placeholder="Additional info" class="w-full" />
+          </div>
+        </div>
+
+        <div class="text-xs text-500 mt-2">
+          * Required fields
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end gap-2">
+        <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
+        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveProduct()" [disabled]="!isFormValid()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
