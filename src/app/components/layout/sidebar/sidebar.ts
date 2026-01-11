@@ -36,12 +36,12 @@ export class SidebarComponent implements OnInit {
       {
         label: 'Customer',
         icon: 'pi pi-users',
-        routerLink: '/customers'
+        routerLink: '/dashboard'
       },
       {
         label: 'Product',
         icon: 'pi pi-box',
-        routerLink: '/dashboard'
+        routerLink: '/product'
       },
       {
         label: 'Transaction',
