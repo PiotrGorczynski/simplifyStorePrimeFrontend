@@ -49,7 +49,8 @@ export class SidebarComponent implements OnInit {
       },
       {
         label: 'Delivery',
-        icon: 'pi pi-truck'
+        icon: 'pi pi-truck',
+        routerLink: '/delivery'
       },
       { separator: true },
       {
