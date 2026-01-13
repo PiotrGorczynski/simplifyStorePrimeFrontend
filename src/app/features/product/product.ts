@@ -16,6 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { ExportService } from '../../services/export.service';
 
 export interface Product {
   id: number;
@@ -87,7 +88,8 @@ export class ProductComponent implements OnInit {
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private exportService: ExportService
   ) {}
 
   ngOnInit() {
@@ -503,6 +505,56 @@ export class ProductComponent implements OnInit {
         console.log('Logging out...');
         this.router.navigate(['/login']);
       }
+    });
+  }
+
+  exportToXLS() {
+    this.exportService.exportToXLS(this.products, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to XLS successfully',
+      life: 2000
+    });
+  }
+
+  exportToExcel() {
+    this.exportService.exportToExcel(this.products, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to Excel successfully',
+      life: 2000
+    });
+  }
+
+  exportToCSV() {
+    this.exportService.exportToCSV(this.products, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to CSV successfully',
+      life: 2000
+    });
+  }
+
+  exportToJSON() {
+    this.exportService.exportToJSON(this.products, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to JSON successfully',
+      life: 2000
+    });
+  }
+
+  exportToHTML() {
+    this.exportService.exportToHTML(this.products, 'customers', 'Customer List');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to HTML successfully',
+      life: 2000
     });
   }
 }

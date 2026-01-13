@@ -18,6 +18,7 @@ import { ToastModule } from 'primeng/toast';
 import { DatePicker } from 'primeng/datepicker';
 import { RippleModule } from 'primeng/ripple';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { ExportService } from '../../services/export.service';
 
 interface TransactionItemModel {
   productId: number;
@@ -142,7 +143,8 @@ export class TransactionComponent implements OnInit {
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private exportService: ExportService
   ) {}
 
   ngOnInit() {
@@ -541,6 +543,56 @@ export class TransactionComponent implements OnInit {
         console.log('Logging out...');
         this.router.navigate(['/login']);
       }
+    });
+  }
+
+  exportToXLS() {
+    this.exportService.exportToXLS(this.transactions, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to XLS successfully',
+      life: 2000
+    });
+  }
+
+  exportToExcel() {
+    this.exportService.exportToExcel(this.transactions, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to Excel successfully',
+      life: 2000
+    });
+  }
+
+  exportToCSV() {
+    this.exportService.exportToCSV(this.transactions, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to CSV successfully',
+      life: 2000
+    });
+  }
+
+  exportToJSON() {
+    this.exportService.exportToJSON(this.transactions, 'customers');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to JSON successfully',
+      life: 2000
+    });
+  }
+
+  exportToHTML() {
+    this.exportService.exportToHTML(this.transactions, 'customers', 'Customer List');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to HTML successfully',
+      life: 2000
     });
   }
 }

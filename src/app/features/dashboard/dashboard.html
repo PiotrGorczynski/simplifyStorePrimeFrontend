@@ -85,12 +85,12 @@
           <div class="export-section">
             <div class="text-xs font-bold text-400 mb-3 uppercase text-center tracking-wider">Export & System</div>
             <div class="export-grid">
-              <p-button icon="pi pi-file-excel" [text]="true" pTooltip="XLSX"></p-button>
-              <p-button icon="pi pi-file-edit" [text]="true" pTooltip="CSV"></p-button>
-              <p-button icon="pi pi-file" [text]="true" pTooltip="XLS"></p-button>
-              <p-button icon="pi pi-code" [text]="true" pTooltip="HTML"></p-button>
-              <p-button icon="pi pi-database" [text]="true" pTooltip="JSON"></p-button>
-              <p-button icon="pi pi-power-off" [text]="true" pTooltip="Exit" styleClass="logout-btn" (onClick)="onLogout()"></p-button>
+              <p-button icon="pi pi-file-excel" [text]="true" pTooltip="XLSX" (onClick)="exportToExcel()"></p-button>
+              <p-button icon="pi pi-file-edit" [text]="true" pTooltip="CSV" (onClick)="exportToCSV()"></p-button>
+              <p-button icon="pi pi-table" [text]="true" pTooltip="XLS" (onClick)="exportToXLS()"></p-button>
+              <p-button icon="pi pi-code" [text]="true" pTooltip="HTML" (onClick)="exportToHTML()"></p-button>
+              <p-button icon="pi pi-database" [text]="true" pTooltip="JSON" (onClick)="exportToJSON()"></p-button>
+              <p-button icon="pi pi-power-off" [text]="true" pTooltip="Exit" class="logout-btn" (onClick)="onLogout()"></p-button>
             </div>
           </div>
         </p-card>

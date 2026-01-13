@@ -16,6 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { ExportService } from '../../services/export.service';
 
 interface DeliveryModel {
   id: number;
@@ -96,7 +97,8 @@ export class DeliveryComponent implements OnInit {
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private exportService: ExportService
   ) {}
 
   ngOnInit() {
@@ -291,6 +293,56 @@ export class DeliveryComponent implements OnInit {
         console.log('Logging out...');
         this.router.navigate(['/login']);
       }
+    });
+  }
+
+  exportToExcel() {
+    this.exportService.exportToExcel(this.deliveries, 'deliveries'); // ← DOBRZE!
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to Excel successfully',
+      life: 2000
+    });
+  }
+
+  exportToXLS() {
+    this.exportService.exportToXLS(this.deliveries, 'deliveries');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to XLS successfully',
+      life: 2000
+    });
+  }
+
+  exportToCSV() {
+    this.exportService.exportToCSV(this.deliveries, 'deliveries');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to CSV successfully',
+      life: 2000
+    });
+  }
+
+  exportToJSON() {
+    this.exportService.exportToJSON(this.deliveries, 'deliveries');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to JSON successfully',
+      life: 2000
+    });
+  }
+
+  exportToHTML() {
+    this.exportService.exportToHTML(this.deliveries, 'deliveries', 'Delivery List');
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Data exported to HTML successfully',
+      life: 2000
     });
   }
 }
