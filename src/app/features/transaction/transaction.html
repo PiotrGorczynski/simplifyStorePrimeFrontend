@@ -1,0 +1,362 @@
+<div class="flex min-h-screen overflow-hidden">
+  <app-sidebar></app-sidebar>
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
+    <div class="grid align-items-stretch m-0 g-2">
+
+      <div class="col-12 lg:col-10 p-2">
+        <p-card class="shadow-2 border-round-xl m-0 h-full">
+          <p-table
+            [value]="transactions"
+            [rows]="20"
+            [paginator]="true"
+            class="p-datatable-sm p-datatable-striped"
+            [rowHover]="true"
+            [(selection)]="selectedTransaction"
+            selectionMode="single"
+            dataKey="id">
+
+            <ng-template #header>
+              <tr>
+                <th style="width: 3rem"></th>
+                <th class="text-xs">ID</th>
+                <th class="text-xs">DATE</th>
+                <th class="text-xs">CUSTOMER</th>
+                <th class="text-xs">TYPE</th>
+                <th class="text-xs">PAYMENT METHOD</th>
+                <th class="text-xs">STATUS</th>
+                <th class="text-xs">TOTAL</th>
+                <th class="text-xs">PROVIDER</th>
+                <th class="text-xs">EMPLOYEE</th>
+              </tr>
+            </ng-template>
+
+            <ng-template #body let-transaction>
+              <tr class="text-xs" [pSelectableRow]="transaction">
+                <td>
+                  <button
+                    type="button"
+                    pButton
+                    pRipple
+                    (click)="toggleRow(transaction); $event.stopPropagation()"
+                    class="p-button-text p-button-rounded p-button-plain p-button-sm"
+                    [icon]="isRowExpanded(transaction) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+                  </button>
+                </td>
+                <td>{{transaction.id}}</td>
+                <td>{{transaction.date | date: 'dd-MM-yyyy'}}</td>
+                <td class="font-bold text-blue-600">{{transaction.customerInfo}}</td>
+                <td><p-tag [value]="transaction.type" severity="info"></p-tag></td>
+                <td>{{transaction.paymentMethod}}</td>
+                <td>
+                  <p-tag
+                    [value]="transaction.status"
+                    [severity]="getStatusSeverity(transaction.status)">
+                  </p-tag>
+                </td>
+                <td class="font-bold" [ngClass]="{'text-green-600': transaction.total >= 0, 'text-red-600': transaction.total < 0}">
+                  ${{transaction.total.toFixed(2)}}
+                </td>
+                <td>{{transaction.provider}}</td>
+                <td>{{transaction.employeeName}}</td>
+              </tr>
+              @if (isRowExpanded(transaction)) {
+                <tr class="expansion-row">
+                  <td colspan="10">
+                    <div class="p-3 surface-50 border-round m-2">
+                      <h5 class="mb-3 text-primary">
+                        <i class="pi pi-shopping-cart mr-2"></i>
+                        Transaction Items ({{transaction.items.length}})
+                      </h5>
+                      <p-table [value]="transaction.items" class="p-datatable-sm">
+                        <ng-template #header>
+                          <tr>
+                            <th>Product Code</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price per Unit</th>
+                            <th>Subtotal</th>
+                          </tr>
+                        </ng-template>
+                        <ng-template #body let-item>
+                          <tr>
+                            <td class="font-semibold">{{item.productCode}}</td>
+                            <td>{{item.productName}}</td>
+                            <td class="text-center">{{item.quantity}}</td>
+                            <td>${{item.pricePerUnit.toFixed(2)}}</td>
+                            <td class="font-bold text-green-600">${{(item.quantity * item.pricePerUnit).toFixed(2)}}</td>
+                          </tr>
+                        </ng-template>
+                        <ng-template #footer>
+                          <tr>
+                            <td colspan="4" class="text-right font-bold">TOTAL:</td>
+                            <td class="font-bold text-green-600 text-xl">${{transaction.total.toFixed(2)}}</td>
+                          </tr>
+                        </ng-template>
+                      </p-table>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </ng-template>
+          </p-table>
+        </p-card>
+      </div>
+
+      <div class="col-12 lg:col-2 p-2">
+        <p-card class="shadow-2 border-round-xl m-0 h-full operations-card">
+          <div class="flex justify-content-center pt-4 mb-2">
+            <img src="logo.png" alt="Logo" class="main-logo">
+          </div>
+
+          <div class="action-buttons-wrapper">
+            <div class="flex flex-column gap-3 action-buttons">
+              <p-button
+                label="SHOW"
+                icon="pi pi-eye"
+                class="w-full"
+                (onClick)="onShowTransaction()">
+              </p-button>
+
+              <p-button
+                label="INSERT"
+                icon="pi pi-plus"
+                severity="success"
+                class="w-full"
+                (onClick)="showDialog()">
+              </p-button>
+
+              <p-button
+                label="UPDATE"
+                icon="pi pi-refresh"
+                severity="warn"
+                class="w-full"
+                (onClick)="showUpdateDialog()">
+              </p-button>
+
+              <p-button
+                label="DELETE"
+                icon="pi pi-trash"
+                severity="danger"
+                class="w-full"
+                (onClick)="deleteTransaction()">
+              </p-button>
+            </div>
+          </div>
+
+          <div class="export-section">
+            <div class="text-xs font-bold text-400 mb-3 uppercase text-center tracking-wider">Export & System</div>
+            <div class="export-grid">
+              <p-button icon="pi pi-file-excel" [text]="true" pTooltip="XLSX"></p-button>
+              <p-button icon="pi pi-file-edit" [text]="true" pTooltip="CSV"></p-button>
+              <p-button icon="pi pi-file" [text]="true" pTooltip="XLS"></p-button>
+              <p-button icon="pi pi-code" [text]="true" pTooltip="HTML"></p-button>
+              <p-button icon="pi pi-database" [text]="true" pTooltip="JSON"></p-button>
+              <p-button icon="pi pi-power-off" [text]="true" pTooltip="Exit" class="logout-btn" (onClick)="onLogout()"></p-button>
+            </div>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog [header]="getDialogHeader()" [(visible)]="displayDialog" [modal]="true" [style]="{width: '900px'}" class="custom-dialog">
+    <ng-template #content>
+      <div class="dialog-form-container">
+        <div class="grid">
+          <div class="col-6">
+            <div class="field-row">
+              <i class="pi pi-calendar field-icon"></i>
+              <label class="field-label">DATE *</label>
+              <div class="field-input">
+                <p-datepicker [(ngModel)]="newTransaction.date" dateFormat="dd-mm-yy" [showIcon]="true" class="w-full"></p-datepicker>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="field-row">
+              <i class="pi pi-users field-icon"></i>
+              <label class="field-label">CUSTOMER *</label>
+              <div class="field-input">
+                <p-select
+                  [(ngModel)]="newTransaction.customerId"
+                  [options]="customerOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select customer"
+                  class="w-full">
+                </p-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-6">
+            <div class="field-row">
+              <i class="pi pi-tag field-icon"></i>
+              <label class="field-label">TYPE *</label>
+              <div class="field-input">
+                <p-select
+                  [(ngModel)]="newTransaction.type"
+                  [options]="typeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select type"
+                  class="w-full">
+                </p-select>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="field-row">
+              <i class="pi pi-credit-card field-icon"></i>
+              <label class="field-label">PAYMENT *</label>
+              <div class="field-input">
+                <p-select
+                  [(ngModel)]="newTransaction.paymentMethod"
+                  [options]="paymentMethodOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select payment method"
+                  class="w-full">
+                </p-select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-6">
+            <div class="field-row">
+              <i class="pi pi-check-circle field-icon"></i>
+              <label class="field-label">STATUS *</label>
+              <div class="field-input">
+                <p-select
+                  [(ngModel)]="newTransaction.status"
+                  [options]="statusOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select status"
+                  class="w-full">
+                </p-select>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="field-row">
+              <i class="pi pi-building field-icon"></i>
+              <label class="field-label">PROVIDER</label>
+              <div class="field-input">
+                <input type="text" pInputText [(ngModel)]="newTransaction.provider" placeholder="Payment provider" class="w-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="items-section mt-4">
+          <h5 class="mb-3 flex align-items-center gap-2">
+            <i class="pi pi-shopping-cart"></i>
+            Transaction Items ({{newTransaction.items?.length || 0}})
+          </h5>
+
+          <div class="add-item-form p-3 surface-100 border-round mb-3">
+            <div class="grid align-items-end">
+              <div class="col-12 md:col-5">
+                <label class="block mb-2 font-semibold text-sm">Product *</label>
+                <p-select
+                  [(ngModel)]="currentItem.productId"
+                  [options]="productOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select product"
+                  class="w-full">
+                </p-select>
+              </div>
+              <div class="col-12 md:col-4">
+                <label class="block mb-2 font-semibold text-sm">Quantity *</label>
+                <p-inputNumber
+                  [(ngModel)]="currentItem.quantity"
+                  [showButtons]="true"
+                  buttonLayout="horizontal"
+                  [min]="1"
+                  inputStyleClass="w-full"
+                  styleClass="w-full">
+                </p-inputNumber>
+              </div>
+              <div class="col-12 md:col-3">
+                <p-button
+                  label="Add"
+                  icon="pi pi-plus"
+                  severity="success"
+                  styleClass="w-full"
+                  (onClick)="addItemToTransaction()">
+                </p-button>
+              </div>
+            </div>
+          </div>
+
+          @if (newTransaction.items && newTransaction.items.length > 0) {
+            <p-table [value]="newTransaction.items" class="p-datatable-sm">
+              <ng-template #header>
+                <tr>
+                  <th>Product Code</th>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Price per Unit</th>
+                  <th>Subtotal</th>
+                  <th style="width: 4rem">Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-item let-rowIndex="rowIndex">
+                <tr>
+                  <td class="font-semibold">{{item.productCode}}</td>
+                  <td>{{item.productName}}</td>
+                  <td class="text-center">{{item.quantity}}</td>
+                  <td>${{item.pricePerUnit.toFixed(2)}}</td>
+                  <td class="font-bold text-green-600">${{(item.quantity * item.pricePerUnit).toFixed(2)}}</td>
+                  <td>
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="danger"
+                      size="small"
+                      (onClick)="removeItemFromTransaction(rowIndex)">
+                    </p-button>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template #footer>
+                <tr>
+                  <td colspan="4" class="text-right font-bold">TOTAL:</td>
+                  <td class="font-bold text-green-600 text-xl" colspan="2">${{newTransaction.total?.toFixed(2) || '0.00'}}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          } @else {
+            <div class="text-center text-500 mt-3">
+              <i class="pi pi-inbox text-4xl mb-2 block"></i>
+              <p>No items added yet. Add products above.</p>
+            </div>
+          }
+        </div>
+
+        <div class="text-xs text-500 mt-3">
+          * Required fields
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #footer>
+      <div class="flex justify-content-end gap-2">
+        <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
+        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveTransaction()" [disabled]="!isFormValid()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

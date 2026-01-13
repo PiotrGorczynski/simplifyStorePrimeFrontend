@@ -45,7 +45,8 @@ export class SidebarComponent implements OnInit {
       },
       {
         label: 'Transaction',
-        icon: 'pi pi-wallet'
+        icon: 'pi pi-wallet',
+        routerLink: '/transaction'
       },
       {
         label: 'Delivery',
