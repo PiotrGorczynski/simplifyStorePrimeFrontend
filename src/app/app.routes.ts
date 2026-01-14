@@ -4,6 +4,7 @@ import { DashboardComponent } from './features/dashboard/dashboard';
 import {ProductComponent} from './features/product/product';
 import {DeliveryComponent} from './features/delivery/delivery';
 import {TransactionComponent} from './features/transaction/transaction';
+import {AnalyticsComponent} from './analytics/analytics';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -12,5 +13,6 @@ export const routes: Routes = [
   { path: 'product', component: ProductComponent },
   { path: 'delivery', component: DeliveryComponent },
   { path: 'transaction', component: TransactionComponent },
+  { path: 'analytics', component: AnalyticsComponent },
   { path: '**', redirectTo: '/login' }
 ];

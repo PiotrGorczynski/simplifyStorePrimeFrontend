@@ -56,7 +56,8 @@ export class SidebarComponent implements OnInit {
       { separator: true },
       {
         label: 'Chart & Analysis',
-        icon: 'pi pi-chart-bar'
+        icon: 'pi pi-chart-bar',
+        routerLink: '/analytics'
       }
     ];
   }

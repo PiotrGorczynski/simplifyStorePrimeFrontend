@@ -1,0 +1,123 @@
+.analytics-container {
+  background-color: var(--surface-ground);
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+h1 {
+  color: #4a148c;
+  font-weight: 700;
+}
+
+.stats-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .stat-icon {
+    font-size: 3rem;
+    opacity: 0.2;
+  }
+}
+
+.sales-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  .stat-label,
+  .stat-value,
+  .stat-icon {
+    color: white !important;
+  }
+}
+
+.customers-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+  .stat-label,
+  .stat-value,
+  .stat-icon {
+    color: white !important;
+  }
+}
+
+.products-card {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+
+  .stat-label,
+  .stat-value,
+  .stat-icon {
+    color: white !important;
+  }
+}
+
+.deliveries-card {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+
+  .stat-label,
+  .stat-value,
+  .stat-icon {
+    color: white !important;
+  }
+}
+
+.chart-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+
+  ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+
+  .chart-container {
+    height: 300px;
+    position: relative;
+  }
+
+  .chart-container-large {
+    height: 400px;
+    position: relative;
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-container {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem !important;
+  }
+
+  .stat-icon {
+    font-size: 2rem !important;
+  }
+}

@@ -1,0 +1,106 @@
+<div class="flex min-h-screen overflow-hidden">
+  <app-sidebar></app-sidebar>
+
+  <div class="analytics-container pt-6 p-4 flex-grow-1 overflow-auto">
+
+    <div class="flex justify-content-between align-items-center mb-4">
+      <h1 class="text-4xl font-bold m-0" style="color: #4a148c;">
+        <i class="pi pi-chart-bar mr-3"></i>
+        Analytics Dashboard
+      </h1>
+      <p-button
+        label="Refresh Data"
+        icon="pi pi-refresh"
+        (onClick)="refreshData()"
+        severity="success">
+      </p-button>
+    </div>
+
+    <div class="grid mb-4" *ngIf="analyticsData">
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card class="stats-card sales-card">
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Total Sales</div>
+              <div class="stat-value">${{analyticsData.totalSales.toFixed(2)}}</div>
+            </div>
+            <i class="pi pi-dollar stat-icon"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card class="stats-card customers-card">
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Total Customers</div>
+              <div class="stat-value">{{analyticsData.totalCustomers}}</div>
+            </div>
+            <i class="pi pi-users stat-icon"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card class="stats-card products-card">
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Total Products</div>
+              <div class="stat-value">{{analyticsData.totalProducts}}</div>
+            </div>
+            <i class="pi pi-box stat-icon"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card class="stats-card deliveries-card">
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Total Deliveries</div>
+              <div class="stat-value">{{analyticsData.totalDeliveries}}</div>
+            </div>
+            <i class="pi pi-truck stat-icon"></i>
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+    <div class="grid mb-4">
+      <div class="col-12 lg:col-6">
+        <p-card class="chart-card">
+          <div class="chart-container">
+            <canvas #paymentMethodsChart></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 lg:col-6">
+        <p-card class="chart-card">
+          <div class="chart-container">
+            <canvas #statusChart></canvas>
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+    <div class="grid mb-4">
+      <div class="col-12 lg:col-8">
+        <p-card class="chart-card">
+          <div class="chart-container-large">
+            <canvas #transactionsByDateChart></canvas>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 lg:col-4">
+        <p-card class="chart-card">
+          <div class="chart-container">
+            <canvas #topProductsChart></canvas>
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+  </div>
+</div>
