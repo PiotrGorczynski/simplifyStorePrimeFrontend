@@ -5,6 +5,10 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { SidebarComponent } from '../components/layout/sidebar/sidebar';
 import { AnalyticsService, AnalyticsData } from '../services/analytics.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 Chart.register(...registerables);
 
@@ -15,10 +19,14 @@ Chart.register(...registerables);
     CommonModule,
     CardModule,
     ButtonModule,
-    SidebarComponent
+    SidebarComponent,
+    ProgressSpinnerModule,
+    TooltipModule,
+    ToastModule
   ],
   templateUrl: './analytics.html',
-  styleUrl: './analytics.scss'
+  styleUrl: './analytics.scss',
+  providers: [MessageService]
 })
 export class AnalyticsComponent implements OnInit {
   @ViewChild('paymentMethodsChart') paymentMethodsChartRef!: ElementRef;
@@ -27,6 +35,13 @@ export class AnalyticsComponent implements OnInit {
   @ViewChild('topProductsChart') topProductsChartRef!: ElementRef;
 
   analyticsData: AnalyticsData | null = null;
+  isLoading = true;
+  errorMessage: string | null = null;
+
+  private paymentMethodsChart?: Chart;
+  private transactionsByDateChart?: Chart;
+  private statusChart?: Chart;
+  private topProductsChart?: Chart;
 
   mockTransactions = [
     {
@@ -118,23 +133,57 @@ export class AnalyticsComponent implements OnInit {
   mockProducts = Array(20).fill(null).map((_, i) => ({ id: i + 1 }));
   mockDeliveries = Array(20).fill(null).map((_, i) => ({ id: i + 1 }));
 
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(
+    private analyticsService: AnalyticsService,
+    private messageService: MessageService
+    ) {}
 
   ngOnInit(): void {
     this.loadAnalytics();
   }
 
   loadAnalytics(): void {
-    this.analyticsData = this.analyticsService.generateAnalytics(
-      this.mockTransactions,
-      this.mockCustomers,
-      this.mockProducts,
-      this.mockDeliveries
-    );
+    this.isLoading = true;
+    this.errorMessage = null;
 
     setTimeout(() => {
-      this.createCharts();
-    }, 100);
+      try {
+        if (this.mockTransactions.length === 0) {
+          throw new Error('No transactions available for analytics');
+        }
+
+        this.analyticsData = this.analyticsService.generateAnalytics(
+          this.mockTransactions,
+          this.mockCustomers,
+          this.mockProducts,
+          this.mockDeliveries
+        );
+
+        this.isLoading = false;
+
+        setTimeout(() => {
+          this.createCharts();
+        }, 100);
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Analytics data loaded successfully',
+          life: 2000
+        });
+
+      } catch (error: any) {
+        this.isLoading = false;
+        this.errorMessage = error.message || 'Failed to load analytics';
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: "Error",
+          life: 3000
+        });
+      }
+    }, 800);
   }
 
   createCharts(): void {
@@ -147,14 +196,21 @@ export class AnalyticsComponent implements OnInit {
   }
 
   createPaymentMethodsChart(): void {
+    if (!this.paymentMethodsChartRef) return;
+
     const canvas = this.paymentMethodsChartRef.nativeElement;
     const ctx = canvas.getContext('2d');
+
+    if (this.paymentMethodsChart) {
+      this.paymentMethodsChart.destroy();
+    }
 
     const data = this.analyticsData!.paymentMethods;
     const labels = data.map((d: any) => d.method);
     const values = data.map((d: any) => d.count);
+    const amounts = data.map((d: any) => d.amount);
 
-    new Chart(ctx, {
+    this.paymentMethodsChart = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: labels,
@@ -183,6 +239,21 @@ export class AnalyticsComponent implements OnInit {
             text: 'Payment Methods Distribution',
             font: { size: 16, weight: 'bold' },
             color: '#4a148c'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context: any) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const amount = amounts[context.dataIndex];
+                const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return [
+                  `${label}: ${value} transactions (${percentage}%)`,
+                  `Revenue: $${amount.toFixed(2)}`
+                ];
+              }
+            }
           }
         }
       }
@@ -190,15 +261,21 @@ export class AnalyticsComponent implements OnInit {
   }
 
   createTransactionsByDateChart(): void {
+    if (!this.transactionsByDateChartRef) return;
+
     const canvas = this.transactionsByDateChartRef.nativeElement;
     const ctx = canvas.getContext('2d');
+
+    if (this.transactionsByDateChart) {
+      this.transactionsByDateChart.destroy();
+    }
 
     const data = this.analyticsData!.transactionsByDate;
     const labels = data.map((d: any) => d.date);
     const counts = data.map((d: any) => d.count);
     const amounts = data.map((d: any) => d.amount);
 
-    new Chart(ctx, {
+    this.transactionsByDateChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
@@ -260,14 +337,20 @@ export class AnalyticsComponent implements OnInit {
   }
 
   createStatusChart(): void {
+    if (!this.statusChartRef) return;
+
     const canvas = this.statusChartRef.nativeElement;
     const ctx = canvas.getContext('2d');
+
+    if (this.statusChart) {
+      this.statusChart.destroy();
+    }
 
     const data = this.analyticsData!.transactionsByStatus;
     const labels = data.map((d: any) => d.status);
     const values = data.map((d: any) => d.count);
 
-    new Chart(ctx, {
+    this.statusChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: labels,
@@ -294,6 +377,17 @@ export class AnalyticsComponent implements OnInit {
             text: 'Transaction Status',
             font: { size: 16, weight: 'bold' },
             color: '#4a148c'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context: any) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
           }
         }
       }
