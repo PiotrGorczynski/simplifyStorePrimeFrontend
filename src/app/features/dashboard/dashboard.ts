@@ -502,14 +502,36 @@ export class DashboardComponent implements OnInit {
     return this.isEditMode ? 'Update Entry' : 'Save Entry';
   }
 
-  onLogout() {
+  onLogout(): void {
     this.confirmationService.confirm({
       message: 'Are you sure you want to logout?',
       header: 'Logout Confirmation',
       icon: 'pi pi-sign-out',
       accept: () => {
-        console.log('Logging out...');
-        this.router.navigate(['/login']);
+        const username = localStorage.getItem('username') || 'User';
+
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        localStorage.removeItem('loginTime');
+
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Logged Out',
+          detail: `Goodbye, ${username}! See you soon.`,
+          life: 2000
+        });
+
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 500);
+      },
+      reject: () => {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cancelled',
+          detail: 'Logout cancelled',
+          life: 1500
+        });
       }
     });
   }

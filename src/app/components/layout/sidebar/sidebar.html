@@ -1,11 +1,16 @@
+<p-toast></p-toast>
 <div class="sidebar-container flex flex-column h-full">
   <div class="header-section p-3">
     <div class="user-profile text-center p-3 surface-card border-round shadow-1 mb-3">
       <p-avatar icon="pi pi-user" size="xlarge" shape="circle"
                 [style]="{'background-color': '#2196F3', 'color': '#ffffff'}"></p-avatar>
       <div class="mt-2">
-        <span class="font-bold text-xl block text-900">Welcome, Piotr!</span>
+        <span class="font-bold text-xl block text-900">Welcome, {{username}}!</span>
         <span class="text-xs text-500 font-medium uppercase">Administrator</span>
+        <div class="text-xs text-500 mt-1" *ngIf="loginTime">
+          <i class="pi pi-sign-in mr-1"></i>
+          Logged in at {{loginTime}}
+        </div>
       </div>
     </div>
     <div class="clock-section p-2 font-bold surface-overlay border-round shadow-1 mb-2">
@@ -16,6 +21,6 @@
     </div>
   </div>
   <div class="menu-section flex-grow-1 px-3">
-    <p-menu [model]="items" styleClass="w-full border-none bg-transparent"></p-menu>
+    <p-menu [model]="items" class="w-full border-none bg-transparent"></p-menu>
   </div>
 </div>

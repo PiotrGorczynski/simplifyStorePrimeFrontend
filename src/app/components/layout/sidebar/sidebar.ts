@@ -1,26 +1,34 @@
-import {Component, OnInit, PLATFORM_ID, Inject} from '@angular/core';
-import { RouterModule } from '@angular/router';
+import {Component, OnInit } from '@angular/core';
+import {Router, RouterModule } from '@angular/router';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { CardModule } from 'primeng/card';
-import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MenuModule, AvatarModule, CardModule],
+  imports: [CommonModule, RouterModule, MenuModule, AvatarModule, CardModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss'
 })
 export class SidebarComponent implements OnInit {
   items: MenuItem[] | undefined;
   currentTime = new Date();
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(private router: Router, private messageService: MessageService) {}
+  username: string = 'User';
+  loginTime: string = '';
 
   ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      setInterval(() => { this.currentTime = new Date(); }, 1000);
+    this.username = localStorage.getItem('username') || 'User';
+    const loginTimeStr = localStorage.getItem('loginTime');
+    if (loginTimeStr) {
+      const date = new Date(loginTimeStr);
+      this.loginTime = date.toLocaleTimeString();
     }
     this.items = [
       {
