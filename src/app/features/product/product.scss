@@ -189,4 +189,81 @@
       }
     }
   }
+
+  .my-app-dark {
+    .custom-dialog {
+      .p-dialog-header {
+        background: #7c4dff !important;
+        color: white !important;
+      }
+
+      .p-dialog-content {
+        background-color: #252526 !important;
+      }
+
+      .field-row {
+        .field-icon {
+          color: #9575cd !important;
+        }
+
+        .field-label {
+          color: #e8e8e8 !important;
+        }
+
+        .field-input {
+          .p-select,
+          input[type="text"],
+          input[type="email"],
+          .p-inputnumber {
+            background: #2d2d30 !important;
+            color: #e8e8e8 !important;
+            border-color: #3e3e42 !important;
+
+            input {
+              background: #2d2d30 !important;
+              color: #e8e8e8 !important;
+            }
+
+            &:focus-within {
+              border-color: #7c4dff !important;
+              box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.25) !important;
+              background: #37373d !important;
+
+              input {
+                background: #37373d !important;
+              }
+            }
+
+            &::placeholder {
+              color: #858585 !important;
+            }
+          }
+
+          textarea.p-inputtextarea {
+            background: #2d2d30 !important;
+            color: #e8e8e8 !important;
+            border-color: #3e3e42 !important;
+
+            &:focus {
+              border-color: #7c4dff !important;
+              box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.25) !important;
+              background: #37373d !important;
+            }
+
+            &::placeholder {
+              color: #858585 !important;
+            }
+          }
+
+          .p-select-label {
+            color: #e8e8e8 !important;
+          }
+        }
+      }
+
+      .text-xs.text-500 {
+        color: #b0b0b0 !important;
+      }
+    }
+  }
 }

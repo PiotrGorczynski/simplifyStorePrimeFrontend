@@ -2,9 +2,14 @@
 <div class="login-container flex min-h-screen surface-ground">
   <div class="login-form-section flex align-items-start justify-content-center col-12 lg:col-5 pt-8 px-5 lg:px-8 bg-white shadow-7 relative z-2">
     <div class="w-full mt-1" style="max-width: 400px;">
-
       <div class="flex justify-content-center mt-1 mb-1">
-        <img src="logo.png" alt="Simplify Store Prime" class="h-auto" style="max-width: 300px;">
+        <img [src]="getLogoPath()"
+             alt="Simplify Store Prime"
+             class="h-auto cursor-pointer"
+             style="max-width: 300px;"
+             (click)="toggleTheme()"
+             pTooltip="Click to toggle theme"
+             tooltipPosition="bottom">
       </div>
 
       <div class="flex flex-column gap-4">

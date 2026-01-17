@@ -9,6 +9,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { fadeInOut } from '../../animations';
+import { ThemeService } from '../services/theme.service';
 
 Chart.register(...registerables);
 
@@ -26,6 +28,7 @@ Chart.register(...registerables);
   ],
   templateUrl: './analytics.html',
   styleUrl: './analytics.scss',
+  animations: [fadeInOut],
   providers: [MessageService]
 })
 export class AnalyticsComponent implements OnInit {
@@ -37,6 +40,7 @@ export class AnalyticsComponent implements OnInit {
   analyticsData: AnalyticsData | null = null;
   isLoading = true;
   errorMessage: string | null = null;
+  isDarkMode = false;
 
   private paymentMethodsChart?: Chart;
   private transactionsByDateChart?: Chart;
@@ -135,10 +139,18 @@ export class AnalyticsComponent implements OnInit {
 
   constructor(
     private analyticsService: AnalyticsService,
-    private messageService: MessageService
-    ) {}
+    private messageService: MessageService,
+    private themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
+    this.themeService.darkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+      if (this.analyticsData) {
+        setTimeout(() => this.createCharts(), 100);
+      }
+    });
+
     this.loadAnalytics();
   }
 
@@ -186,6 +198,14 @@ export class AnalyticsComponent implements OnInit {
     }, 800);
   }
 
+  private getChartColors() {
+    return {
+      text: this.isDarkMode ? '#e8e8e8' : '#666',
+      title: this.isDarkMode ? '#e8e8e8' : '#4a148c',
+      grid: this.isDarkMode ? '#3e3e42' : '#e0e0e0'
+    };
+  }
+
   createCharts(): void {
     if (!this.analyticsData) return;
 
@@ -209,6 +229,7 @@ export class AnalyticsComponent implements OnInit {
     const labels = data.map((d: any) => d.method);
     const values = data.map((d: any) => d.count);
     const amounts = data.map((d: any) => d.amount);
+    const colors = this.getChartColors();
 
     this.paymentMethodsChart = new Chart(ctx, {
       type: 'pie',
@@ -232,13 +253,16 @@ export class AnalyticsComponent implements OnInit {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'bottom'
+            position: 'bottom',
+            labels: {
+              color: colors.text
+            }
           },
           title: {
             display: true,
             text: 'Payment Methods Distribution',
             font: { size: 16, weight: 'bold' },
-            color: '#4a148c'
+            color: colors.title
           },
           tooltip: {
             callbacks: {
@@ -274,6 +298,7 @@ export class AnalyticsComponent implements OnInit {
     const labels = data.map((d: any) => d.date);
     const counts = data.map((d: any) => d.count);
     const amounts = data.map((d: any) => d.amount);
+    const colors = this.getChartColors();
 
     this.transactionsByDateChart = new Chart(ctx, {
       type: 'bar',
@@ -302,13 +327,28 @@ export class AnalyticsComponent implements OnInit {
           intersect: false
         },
         scales: {
+          x: {
+            ticks: {
+              color: colors.text
+            },
+            grid: {
+              color: colors.grid
+            }
+          },
           y: {
             type: 'linear',
             display: true,
             position: 'left',
             title: {
               display: true,
-              text: 'Count'
+              text: 'Count',
+              color: colors.text
+            },
+            ticks: {
+              color: colors.text
+            },
+            grid: {
+              color: colors.grid
             }
           },
           y1: {
@@ -317,7 +357,11 @@ export class AnalyticsComponent implements OnInit {
             position: 'right',
             title: {
               display: true,
-              text: 'Revenue ($)'
+              text: 'Revenue ($)',
+              color: colors.text
+            },
+            ticks: {
+              color: colors.text
             },
             grid: {
               drawOnChartArea: false
@@ -325,11 +369,16 @@ export class AnalyticsComponent implements OnInit {
           }
         },
         plugins: {
+          legend: {
+            labels: {
+              color: colors.text
+            }
+          },
           title: {
             display: true,
             text: 'Transactions Over Time (Last 7 Days)',
             font: { size: 16, weight: 'bold' },
-            color: '#4a148c'
+            color: colors.title
           }
         }
       }
@@ -349,6 +398,7 @@ export class AnalyticsComponent implements OnInit {
     const data = this.analyticsData!.transactionsByStatus;
     const labels = data.map((d: any) => d.status);
     const values = data.map((d: any) => d.count);
+    const colors = this.getChartColors();
 
     this.statusChart = new Chart(ctx, {
       type: 'doughnut',
@@ -370,13 +420,16 @@ export class AnalyticsComponent implements OnInit {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'bottom'
+            position: 'bottom',
+            labels: {
+              color: colors.text
+            }
           },
           title: {
             display: true,
             text: 'Transaction Status',
             font: { size: 16, weight: 'bold' },
-            color: '#4a148c'
+            color: colors.title
           },
           tooltip: {
             callbacks: {
@@ -395,14 +448,21 @@ export class AnalyticsComponent implements OnInit {
   }
 
   createTopProductsChart(): void {
+    if (!this.topProductsChartRef) return;
+
     const canvas = this.topProductsChartRef.nativeElement;
     const ctx = canvas.getContext('2d');
+
+    if (this.topProductsChart) {
+      this.topProductsChart.destroy();
+    }
 
     const data = this.analyticsData!.topProducts;
     const labels = data.map((d: any) => d.name);
     const revenues = data.map((d: any) => d.revenue);
+    const colors = this.getChartColors();
 
-    new Chart(ctx, {
+    this.topProductsChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
@@ -416,6 +476,24 @@ export class AnalyticsComponent implements OnInit {
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: {
+              color: colors.text
+            },
+            grid: {
+              color: colors.grid
+            }
+          },
+          y: {
+            ticks: {
+              color: colors.text
+            },
+            grid: {
+              color: colors.grid
+            }
+          }
+        },
         plugins: {
           legend: {
             display: false
@@ -424,7 +502,7 @@ export class AnalyticsComponent implements OnInit {
             display: true,
             text: 'Top 5 Products by Revenue',
             font: { size: 16, weight: 'bold' },
-            color: '#4a148c'
+            color: colors.title
           }
         }
       }

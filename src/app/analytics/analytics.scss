@@ -192,6 +192,44 @@ h1 {
   }
 }
 
+::ng-deep {
+  .my-app-dark {
+    .analytics-container {
+      background-color: #1a1a1a;
+
+      h1 {
+        color: #e8e8e8 !important;
+      }
+    }
+
+    .chart-card {
+      background: #252526 !important;
+
+      .p-card-header {
+        border-bottom-color: #3e3e42 !important;
+      }
+
+      .chart-header {
+        .chart-title {
+          color: #e8e8e8 !important;
+        }
+
+        i {
+          color: #9575cd !important;
+        }
+      }
+    }
+
+    .loading-state,
+    .error-state,
+    .empty-state {
+      h3, p {
+        color: #e8e8e8 !important;
+      }
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .analytics-container {
     padding: 1rem;

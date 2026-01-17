@@ -19,6 +19,8 @@ import { DatePicker } from 'primeng/datepicker';
 import { RippleModule } from 'primeng/ripple';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ExportService } from '../../services/export.service';
+import { fadeInOut } from '../../../animations';
+import { ThemeService } from '../../services/theme.service';
 
 interface TransactionItemModel {
   productId: number;
@@ -65,6 +67,7 @@ interface TransactionModel {
     RippleModule
   ],
   providers: [ConfirmationService, MessageService],
+  animations: [fadeInOut],
   templateUrl: './transaction.html',
   styleUrl: './transaction.scss'
 })
@@ -74,6 +77,7 @@ export class TransactionComponent implements OnInit {
   isEditMode: boolean = false;
   selectedTransactionId: number | null = null;
   selectedTransaction: TransactionModel | null = null;
+  isDarkMode = false;
 
   expandedRowIds: Set<number> = new Set();
 
@@ -144,7 +148,8 @@ export class TransactionComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -303,6 +308,13 @@ export class TransactionComponent implements OnInit {
         ]
       }
     ];
+    this.themeService.darkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+    });
+  }
+
+  getLogoPath(): string {
+    return this.isDarkMode ? 'logo-dark.png' : 'logo.png';
   }
 
   toggleRow(transaction: TransactionModel) {

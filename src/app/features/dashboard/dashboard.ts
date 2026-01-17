@@ -17,6 +17,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ExportService } from '../../services/export.service';
+import { fadeInOut } from '../../../animations';
+import { ThemeService } from '../../services/theme.service';
 
 interface Customer {
   id: number;
@@ -52,6 +54,7 @@ interface Customer {
     ToastModule
   ],
   providers: [ConfirmationService, MessageService],
+  animations: [fadeInOut],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -61,6 +64,7 @@ export class DashboardComponent implements OnInit {
   isEditMode: boolean = false;
   selectedCustomerId: number | null = null;
   selectedCustomer: Customer | null = null;
+  isDarkMode = false;
 
   newProduct: Partial<Customer> = {
     info: '',
@@ -100,7 +104,8 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -346,6 +351,13 @@ export class DashboardComponent implements OnInit {
         supportRequests: '4 pending'
       }
     ];
+    this.themeService.darkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+    });
+  }
+
+  getLogoPath(): string {
+    return this.isDarkMode ? 'logo-dark.png' : 'logo.png';
   }
 
   showDialog() {

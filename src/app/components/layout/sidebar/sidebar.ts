@@ -1,5 +1,5 @@
-import {Component, OnInit } from '@angular/core';
-import {Router, RouterModule } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
@@ -7,11 +7,23 @@ import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { FormsModule } from '@angular/forms';
+import { ThemeService } from '../../../services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MenuModule, AvatarModule, CardModule, ToastModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MenuModule,
+    AvatarModule,
+    CardModule,
+    ToastModule,
+    ToggleSwitchModule,
+    FormsModule
+  ],
   providers: [MessageService],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss'
@@ -19,9 +31,15 @@ import { MessageService } from 'primeng/api';
 export class SidebarComponent implements OnInit {
   items: MenuItem[] | undefined;
   currentTime = new Date();
-  constructor(private router: Router, private messageService: MessageService) {}
   username: string = 'User';
   loginTime: string = '';
+  isDarkMode = false;
+
+  constructor(
+    private router: Router,
+    private messageService: MessageService,
+    private themeService: ThemeService
+  ) {}
 
   ngOnInit() {
     this.username = localStorage.getItem('username') || 'User';
@@ -30,6 +48,15 @@ export class SidebarComponent implements OnInit {
       const date = new Date(loginTimeStr);
       this.loginTime = date.toLocaleTimeString();
     }
+
+    this.themeService.darkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+    });
+
+    setInterval(() => {
+      this.currentTime = new Date();
+    }, 1000);
+
     this.items = [
       {
         label: 'Info About Author',
@@ -68,5 +95,9 @@ export class SidebarComponent implements OnInit {
         routerLink: '/analytics'
       }
     ];
+  }
+
+  toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
   }
 }

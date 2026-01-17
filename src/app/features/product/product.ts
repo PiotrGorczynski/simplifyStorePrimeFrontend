@@ -17,6 +17,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ExportService } from '../../services/export.service';
+import { fadeInOut } from '../../../animations';
+import { ThemeService } from '../../services/theme.service';
 
 export interface Product {
   id: number;
@@ -52,6 +54,7 @@ export interface Product {
     ToastModule
   ],
   providers: [ConfirmationService, MessageService],
+  animations: [fadeInOut],
   templateUrl: './product.html',
   styleUrl: './product.scss'
 })
@@ -61,6 +64,7 @@ export class ProductComponent implements OnInit {
   isEditMode: boolean = false;
   selectedProductId: number | null = null;
   selectedProduct: Product | null = null;
+  isDarkMode = false;
 
   newProduct: Partial<Product> = {
     name: '',
@@ -89,7 +93,8 @@ export class ProductComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -335,6 +340,14 @@ export class ProductComponent implements OnInit {
         another: 'Stretch fabric'
       }
     ];
+
+    this.themeService.darkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+    });
+  }
+
+  getLogoPath(): string {
+    return this.isDarkMode ? 'logo-dark.png' : 'logo.png';
   }
 
   showDialog() {

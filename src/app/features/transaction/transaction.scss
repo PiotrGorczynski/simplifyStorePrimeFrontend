@@ -260,4 +260,85 @@
       background: rgba(124, 77, 255, 0.1) !important;
     }
   }
+
+  .my-app-dark {
+    .custom-dialog {
+      .p-dialog-header {
+        background: #7c4dff !important;
+        color: white !important;
+      }
+
+      .p-dialog-content {
+        background-color: #252526 !important;
+      }
+
+      .field-row {
+        .field-icon {
+          color: #9575cd !important;
+        }
+
+        .field-label {
+          color: #e8e8e8 !important;
+        }
+
+        .field-input {
+          .p-select,
+          .p-datepicker,
+          .p-inputnumber,
+          input[type="text"] {
+            background: #2d2d30 !important;
+            color: #e8e8e8 !important;
+            border-color: #3e3e42 !important;
+
+            input {
+              background: #2d2d30 !important;
+              color: #e8e8e8 !important;
+            }
+
+            &:focus-within {
+              border-color: #7c4dff !important;
+              box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.25) !important;
+              background: #37373d !important;
+
+              input {
+                background: #37373d !important;
+              }
+            }
+          }
+
+          .p-select-label {
+            color: #e8e8e8 !important;
+          }
+        }
+      }
+
+      .items-section {
+        background: #1e1e1e !important;
+        border-color: #3e3e42 !important;
+
+        h5 {
+          color: #e8e8e8 !important;
+        }
+
+        .add-item-form {
+          background: #252526 !important;
+          border-color: #7c4dff !important;
+
+          label {
+            color: #e8e8e8 !important;
+          }
+        }
+
+        .text-center.text-500 {
+          .pi-inbox {
+            color: #64748b;
+          }
+
+          p {
+            color: #b0b0b0;
+          }
+        }
+      }
+    }
+  }
 }

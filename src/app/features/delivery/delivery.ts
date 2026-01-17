@@ -17,6 +17,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ExportService } from '../../services/export.service';
+import { fadeInOut } from '../../../animations';
+import {ThemeService} from '../../services/theme.service';
 
 interface DeliveryModel {
   id: number;
@@ -47,6 +49,7 @@ interface DeliveryModel {
     ToastModule
   ],
   providers: [ConfirmationService, MessageService],
+  animations: [fadeInOut],
   templateUrl: './delivery.html',
   styleUrl: './delivery.scss'
 })
@@ -56,6 +59,7 @@ export class DeliveryComponent implements OnInit {
   isEditMode: boolean = false;
   selectedDeliveryId: number | null = null;
   selectedDelivery: DeliveryModel | null = null;
+  isDarkMode = false;
 
   newDelivery: Partial<DeliveryModel> = {
     deliveryType: '',
@@ -98,7 +102,8 @@ export class DeliveryComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -124,6 +129,13 @@ export class DeliveryComponent implements OnInit {
       { id: 19, deliveryType: 'in-store pickup', status: 'delivered', provider: 'InPost', transactionId: 1 },
       { id: 20, deliveryType: 'international', status: 'delivered', provider: 'DHL', transactionId: 17 }
     ];
+    this.themeService.darkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+    });
+  }
+
+  getLogoPath(): string {
+    return this.isDarkMode ? 'logo-dark.png' : 'logo.png';
   }
 
   showDialog() {

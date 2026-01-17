@@ -1,4 +1,4 @@
-<div class="flex min-h-screen overflow-hidden">
+<div class="flex min-h-screen overflow-hidden" [@fadeInOut]>
   <app-sidebar></app-sidebar>
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
@@ -59,7 +59,7 @@
       <div class="col-12 lg:col-2 p-2">
         <p-card styleClass="shadow-2 border-round-xl m-0 h-full operations-card">
           <div class="flex justify-content-center pt-4 mb-2">
-            <img src="logo.png" alt="Logo" class="main-logo">
+            <img [src]="getLogoPath()" alt="Logo" class="main-logo">
           </div>
 
           <div class="action-buttons-wrapper">
