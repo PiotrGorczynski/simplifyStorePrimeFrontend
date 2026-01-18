@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { SidebarComponent } from '../../components/layout/sidebar/sidebar';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
@@ -38,7 +37,6 @@ interface DeliveryModel {
     CardModule,
     TagModule,
     TooltipModule,
-    SidebarComponent,
     FormsModule,
     DialogModule,
     RadioButtonModule,

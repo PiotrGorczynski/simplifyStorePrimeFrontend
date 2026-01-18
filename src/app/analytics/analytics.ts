@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
-import { SidebarComponent } from '../components/layout/sidebar/sidebar';
 import { AnalyticsService, AnalyticsData } from '../services/analytics.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
@@ -21,7 +20,6 @@ Chart.register(...registerables);
     CommonModule,
     CardModule,
     ButtonModule,
-    SidebarComponent,
     ProgressSpinnerModule,
     TooltipModule,
     ToastModule

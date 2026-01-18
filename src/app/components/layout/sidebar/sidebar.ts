@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
@@ -35,6 +35,8 @@ import { TooltipModule } from 'primeng/tooltip';
   styleUrl: './sidebar.scss'
 })
 export class SidebarComponent implements OnInit {
+  @Output() menuItemClicked = new EventEmitter<void>();
+
   items: MenuItem[] | undefined;
   currentTime = new Date();
   username: string = 'User';
@@ -69,48 +71,61 @@ export class SidebarComponent implements OnInit {
       {
         label: 'Info About Author',
         icon: 'pi pi-id-card',
-        command: () => this.infoDialogService.showAuthorInfo()
+        command: () => {
+          this.infoDialogService.showAuthorInfo();
+          this.onMenuClick();
+        }
       },
       {
         label: 'Info About App',
         icon: 'pi pi-info-circle',
-        command: () => this.infoDialogService.showAppInfo()
+        command: () => {
+          this.infoDialogService.showAppInfo();
+          this.onMenuClick();
+        }
       },
       { separator: true },
       {
         label: 'Customer',
         icon: 'pi pi-users',
-        routerLink: '/dashboard'
+        routerLink: '/dashboard',
+        command: () => this.onMenuClick()
       },
       {
         label: 'Product',
         icon: 'pi pi-box',
-        routerLink: '/product'
+        routerLink: '/product',
+        command: () => this.onMenuClick()
       },
       {
         label: 'Transaction',
         icon: 'pi pi-wallet',
-        routerLink: '/transaction'
+        routerLink: '/transaction',
+        command: () => this.onMenuClick()
       },
       {
         label: 'Delivery',
         icon: 'pi pi-truck',
-        routerLink: '/delivery'
+        routerLink: '/delivery',
+        command: () => this.onMenuClick()
       },
       { separator: true },
       {
         label: 'Chart & Analysis',
         icon: 'pi pi-chart-bar',
-        routerLink: '/analytics'
+        routerLink: '/analytics',
+        command: () => this.onMenuClick()
       }
     ];
   }
 
+  onMenuClick(): void {
+    this.menuItemClicked.emit();
+  }
+
   toggleDarkMode(): void {
     this.isAnimating = true;
-
     this.themeService.toggleDarkMode();
-
     setTimeout(() => {
       this.isAnimating = false;
     }, 500);

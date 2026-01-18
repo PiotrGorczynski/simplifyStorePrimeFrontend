@@ -494,3 +494,73 @@ html {
     }
   }
 }
+
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 0 1rem;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .hamburger-btn,
+  .theme-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+
+    i {
+      font-size: 1.4rem;
+    }
+
+    &:hover {
+      background: var(--surface-hover);
+    }
+  }
+
+  .mobile-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+}
+
+@media (max-width: 991px) {
+  .mobile-header {
+    display: flex !important;
+  }
+}
+
+.my-app-dark {
+  .mobile-header {
+    background: #252526;
+    border-bottom: 1px solid #3e3e42;
+
+    .hamburger-btn,
+    .theme-btn {
+      color: #e8e8e8;
+
+      &:hover {
+        background: #37373d;
+      }
+    }
+
+    .mobile-title {
+      color: #e8e8e8;
+    }
+  }
+}

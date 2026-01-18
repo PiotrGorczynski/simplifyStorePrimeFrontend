@@ -1,10 +1,27 @@
 <div class="layout-wrapper">
-  <div class="layout-sidebar">
-    <app-sidebar></app-sidebar>
+  <div class="mobile-header">
+    <button class="hamburger-btn" (click)="toggleSidebar()">
+      <i class="pi" [ngClass]="sidebarVisible ? 'pi-times' : 'pi-bars'"></i>
+    </button>
+    <span class="mobile-title">Simplify Store Prime</span>
+    <button class="theme-btn" (click)="toggleTheme()">
+      <i class="pi" [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'"></i>
+    </button>
+  </div>
+
+  <div
+    class="sidebar-overlay"
+    [class.visible]="sidebarVisible"
+    (click)="closeSidebar()">
+  </div>
+
+  <div class="layout-sidebar" [class.mobile-visible]="sidebarVisible">
+    <app-sidebar (menuItemClicked)="closeSidebar()"></app-sidebar>
   </div>
 
   <div class="layout-content">
     <div class="content-container">
-      <router-outlet></router-outlet> </div>
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>

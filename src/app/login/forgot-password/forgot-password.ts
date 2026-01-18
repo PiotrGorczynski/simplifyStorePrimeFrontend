@@ -64,7 +64,6 @@ export class ForgotPasswordComponent implements OnInit {
 
     this.isLoading = true;
 
-    // Simulate API call
     setTimeout(() => {
       this.isLoading = false;
 

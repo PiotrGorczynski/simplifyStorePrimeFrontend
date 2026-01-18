@@ -1,0 +1,12 @@
+<div class="loading-container" *ngIf="isLoading">
+  <div class="progress-bar">
+    <div class="progress-bar-fill"></div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="showOverlay">
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <span class="loading-text">Loading...</span>
+    </div>
+  </div>
+</div>
