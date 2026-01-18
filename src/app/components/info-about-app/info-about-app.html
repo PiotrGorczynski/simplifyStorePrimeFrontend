@@ -1,0 +1,50 @@
+<div class="app-dialog">
+  <div class="app-header">
+    <div class="logo-container">
+      <div class="logo">
+        <i class="pi pi-shopping-bag"></i>
+      </div>
+    </div>
+    <div class="app-titles">
+      <h1 class="app-name">Simplify Store Prime</h1>
+      <p class="app-motto">"Do It Simple, Keep It Simple"</p>
+    </div>
+  </div>
+  <div class="app-description">
+    <p>
+      A comprehensive business management solution designed for simplicity and efficiency.
+      Manage your customers, products, transactions, and deliveries all in one place
+      with a clean, intuitive interface.
+    </p>
+  </div>
+  <div class="features-section">
+    <h3><i class="pi pi-star"></i> Key Features</h3>
+    <div class="features-grid">
+      <div class="feature-item" *ngFor="let feature of features">
+        <i [class]="feature.icon"></i>
+        <div class="feature-info">
+          <span class="feature-title">{{ feature.title }}</span>
+          <span class="feature-desc">{{ feature.desc }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tech-section">
+    <h3><i class="pi pi-server"></i> Built With</h3>
+    <div class="tech-pills">
+      <span class="tech-pill" *ngFor="let tech of techStack">
+        {{ tech.name }}
+      </span>
+    </div>
+  </div>
+  <div class="app-footer">
+    <span class="version-badge">
+      <i class="pi pi-tag"></i> Version {{ appVersion }}
+    </span>
+    <p-button
+      label="CLOSE"
+      (onClick)="close()"
+      styleClass="close-btn">
+    </p-button>
+  </div>
+</div>

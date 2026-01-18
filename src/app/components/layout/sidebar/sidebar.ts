@@ -10,6 +10,10 @@ import { MessageService } from 'primeng/api';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../../services/theme.service';
+import { InfoDialogService } from '../../../services/info-dialog';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { TooltipModule } from 'primeng/tooltip';
+
 
 @Component({
   selector: 'app-sidebar',
@@ -22,7 +26,9 @@ import { ThemeService } from '../../../services/theme.service';
     CardModule,
     ToastModule,
     ToggleSwitchModule,
-    FormsModule
+    FormsModule,
+    DynamicDialogModule,
+    TooltipModule
   ],
   providers: [MessageService],
   templateUrl: './sidebar.html',
@@ -34,11 +40,13 @@ export class SidebarComponent implements OnInit {
   username: string = 'User';
   loginTime: string = '';
   isDarkMode = false;
+  isAnimating = false;
 
   constructor(
     private router: Router,
     private messageService: MessageService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private infoDialogService: InfoDialogService
   ) {}
 
   ngOnInit() {
@@ -61,11 +69,12 @@ export class SidebarComponent implements OnInit {
       {
         label: 'Info About Author',
         icon: 'pi pi-id-card',
-        command: () => console.log('Info kliknięte')
+        command: () => this.infoDialogService.showAuthorInfo()
       },
       {
         label: 'Info About App',
-        icon: 'pi pi-info-circle'
+        icon: 'pi pi-info-circle',
+        command: () => this.infoDialogService.showAppInfo()
       },
       { separator: true },
       {
@@ -98,6 +107,12 @@ export class SidebarComponent implements OnInit {
   }
 
   toggleDarkMode(): void {
+    this.isAnimating = true;
+
     this.themeService.toggleDarkMode();
+
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 500);
   }
 }

@@ -1,0 +1,54 @@
+<div class="author-dialog">
+  <div class="author-header">
+    <div class="avatar-container">
+      <div class="avatar">
+        <i class="pi pi-user"></i>
+      </div>
+      <div class="status-badge">
+        <i class="pi pi-code"></i>
+      </div>
+    </div>
+    <h2 class="author-name">Piotr Gorczyński</h2>
+    <p class="author-title">Java Developer & Master's Student</p>
+  </div>
+  <div class="author-about">
+    <p>
+      I'm a passionate Java developer finishing my Master's degree this year.
+      Programming is not just my profession – it's my passion. I work with Java
+      and its ecosystem daily, with a special fondness for Swing framework
+      despite its age.
+    </p>
+    <p>
+      This application was designed and developed by me as a personal project
+      to showcase modern web development practices combined with a clean,
+      user-friendly interface.
+    </p>
+  </div>
+  <div class="tech-section">
+    <h3><i class="pi pi-wrench"></i> Tech Stack</h3>
+    <div class="tech-grid">
+      <div class="tech-item" *ngFor="let tech of technologies" [pTooltip]="tech.name">
+        <span class="tech-name">{{ tech.name }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="social-section">
+    <h3><i class="pi pi-share-alt"></i> Connect with me</h3>
+    <div class="social-links">
+      <button
+        *ngFor="let link of socialLinks"
+        class="social-btn"
+        [pTooltip]="link.name"
+        (click)="openLink(link.url)">
+        <i [class]="link.icon"></i>
+      </button>
+    </div>
+  </div>
+  <div class="author-footer">
+    <p-button
+      label="CLOSE"
+      (onClick)="close()"
+      styleClass="close-btn">
+    </p-button>
+  </div>
+</div>

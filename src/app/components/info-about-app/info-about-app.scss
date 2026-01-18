@@ -1,0 +1,230 @@
+:host {
+  display: block;
+}
+
+::ng-deep .info-dialog {
+  .p-dialog-content {
+    padding: 0 !important;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .p-dialog-header {
+    display: none !important;
+  }
+}
+
+.app-dialog {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.app-header {
+  text-align: center;
+
+  .logo-container {
+    margin-bottom: 1rem;
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+      i {
+        font-size: 2.5rem;
+        color: white;
+      }
+    }
+  }
+
+  .app-titles {
+    .app-name {
+      margin: 0;
+      font-family: 'Brush Script MT', cursive;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .app-motto {
+      margin: 0.5rem 0 0;
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-style: italic;
+    }
+  }
+}
+
+.app-description {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+}
+
+.features-section {
+  h3 {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      font-size: 1rem;
+      color: #FFD700;
+    }
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+
+    .feature-item {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(4px);
+      }
+
+      > i {
+        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        flex-shrink: 0;
+      }
+
+      .feature-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+
+        .feature-title {
+          font-weight: 600;
+          font-size: 0.9rem;
+        }
+
+        .feature-desc {
+          font-size: 0.75rem;
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+}
+
+.tech-section {
+  h3 {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+
+    .tech-pill {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+.app-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
+
+  .version-badge {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.4rem 1rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+
+  ::ng-deep .close-btn {
+    background: white !important;
+    color: #667eea !important;
+    border: none !important;
+    font-weight: 600;
+    padding: 0.75rem 2.5rem !important;
+    border-radius: 25px !important;
+    transition: all 0.3s ease !important;
+
+    &:hover {
+      background: #f0f0f0 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .features-section {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

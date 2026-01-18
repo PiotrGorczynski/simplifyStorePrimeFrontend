@@ -2,8 +2,21 @@
 <div class="sidebar-container flex flex-column h-full">
   <div class="header-section p-3">
     <div class="user-profile text-center p-3 surface-card border-round shadow-1 mb-3">
-      <p-avatar icon="pi pi-user" size="xlarge" shape="circle"
-                [style]="{'background-color': '#2196F3', 'color': '#ffffff'}"></p-avatar>
+      <div class="avatar-wrapper"
+           (click)="toggleDarkMode()"
+           pTooltip="Click to toggle theme"
+           tooltipPosition="right"
+           [class.rotating]="isAnimating">
+        <p-avatar
+          [icon]="isDarkMode ? 'pi pi-moon' : 'pi pi-sun'"
+          size="xlarge"
+          shape="circle"
+          [style]="{'background-color': isDarkMode ? '#1e1e2e' : '#2196F3', 'color': '#ffffff', 'cursor': 'pointer'}">
+        </p-avatar>
+        <div class="theme-indicator" [class.dark]="isDarkMode">
+          <i class="pi" [ngClass]="isDarkMode ? 'pi-moon' : 'pi-sun'"></i>
+        </div>
+      </div>
       <div class="mt-2">
         <span class="font-bold text-xl block text-900">Welcome, {{username}}!</span>
         <span class="text-xs text-500 font-medium uppercase">Administrator</span>
@@ -29,7 +42,7 @@
         </p-toggleSwitch>
       </div>
     </div>
-    <div class="date-mini p-2 font-bold surface-overlay border-round shadow-1">
+    <div class="date-mini p-2 font-bold surface-overlay border-round shadow-1 mb-3">
       <i class="pi pi-calendar mr-2"></i> {{ currentTime | date: 'dd-MM-yyyy' }}
     </div>
   </div>
