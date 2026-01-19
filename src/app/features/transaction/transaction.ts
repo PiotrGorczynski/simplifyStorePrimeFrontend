@@ -578,12 +578,12 @@ export class TransactionComponent implements OnInit {
     });
   }
 
-  exportToXLS() {
-    this.exportService.exportToXLS(this.transactions, 'customers');
+  exportToPDF() {
+    this.exportService.exportToPDF(this.transactions, 'transactions', 'Transaction List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
-      detail: 'Data exported to XLS successfully',
+      detail: 'Data exported to PDF successfully',
       life: 2000
     });
   }

@@ -6,6 +6,22 @@
   min-height: 100vh;
 }
 
+@media (max-width: 991px) {
+  .dashboard-container {
+    padding-right: 0.5rem !important;
+  }
+
+  .operations-panel-desktop {
+    display: none !important;
+  }
+
+  .table-column {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
 ::ng-deep {
   .p-datatable-wrapper {
     overflow-y: visible !important;

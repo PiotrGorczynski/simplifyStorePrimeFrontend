@@ -1,11 +1,11 @@
-<div class="flex min-h-screen overflow-hidden" [@fadeInOut]>
+<div class="flex min-h-screen overflow-hidden">
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
   <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
     <div class="grid align-items-stretch m-0 g-2">
 
-      <div class="col-12 lg:col-10 p-2">
+      <div class="col-12 lg:col-10 p-2 table-column">
         <p-card styleClass="shadow-2 border-round-xl m-0 h-full">
           <p-table
             [value]="products"
@@ -55,7 +55,7 @@
         </p-card>
       </div>
 
-      <div class="col-12 lg:col-2 p-2">
+      <div class="col-12 lg:col-2 p-2 operations-panel-desktop">
         <p-card styleClass="shadow-2 border-round-xl m-0 h-full operations-card">
           <div class="flex justify-content-center pt-4 mb-2">
             <img [src]="getLogoPath()" alt="Logo" class="main-logo">
@@ -101,7 +101,7 @@
             <div class="export-grid">
               <p-button icon="pi pi-file-excel" [text]="true" pTooltip="XLSX" (onClick)="exportToExcel()"></p-button>
               <p-button icon="pi pi-file-edit" [text]="true" pTooltip="CSV" (onClick)="exportToCSV()"></p-button>
-              <p-button icon="pi pi-table" [text]="true" pTooltip="XLS" (onClick)="exportToXLS()"></p-button>
+              <p-button icon="pi pi-file-pdf" [text]="true" pTooltip="PDF" (onClick)="exportToPDF()"></p-button>
               <p-button icon="pi pi-code" [text]="true" pTooltip="HTML" (onClick)="exportToHTML()"></p-button>
               <p-button icon="pi pi-database" [text]="true" pTooltip="JSON" (onClick)="exportToJSON()"></p-button>
               <p-button icon="pi pi-power-off" [text]="true" pTooltip="Exit" class="logout-btn" (onClick)="onLogout()"></p-button>

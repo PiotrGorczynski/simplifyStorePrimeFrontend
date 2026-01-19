@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -15,9 +15,10 @@ import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 import { ExportService } from '../../services/export.service';
-import { fadeInOut } from '../../../animations';
-import {ThemeService} from '../../services/theme.service';
+import { ThemeService } from '../../services/theme.service';
+import { ActionService, ActionType } from '../../services/action.service';
 
 interface DeliveryModel {
   id: number;
@@ -47,17 +48,18 @@ interface DeliveryModel {
     ToastModule
   ],
   providers: [ConfirmationService, MessageService],
-  animations: [fadeInOut],
   templateUrl: './delivery.html',
   styleUrl: './delivery.scss'
 })
-export class DeliveryComponent implements OnInit {
+export class DeliveryComponent implements OnInit, OnDestroy {
   deliveries: DeliveryModel[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
   selectedDeliveryId: number | null = null;
   selectedDelivery: DeliveryModel | null = null;
   isDarkMode = false;
+
+  private actionSubscription: Subscription | null = null;
 
   newDelivery: Partial<DeliveryModel> = {
     deliveryType: '',
@@ -101,7 +103,8 @@ export class DeliveryComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private exportService: ExportService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private actionService: ActionService
   ) {}
 
   ngOnInit() {
@@ -127,9 +130,53 @@ export class DeliveryComponent implements OnInit {
       { id: 19, deliveryType: 'in-store pickup', status: 'delivered', provider: 'InPost', transactionId: 1 },
       { id: 20, deliveryType: 'international', status: 'delivered', provider: 'DHL', transactionId: 17 }
     ];
+
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
+
+    this.actionSubscription = this.actionService.action$.subscribe((action: ActionType) => {
+      this.handleAction(action);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.actionSubscription) {
+      this.actionSubscription.unsubscribe();
+    }
+  }
+
+  private handleAction(action: ActionType): void {
+    switch (action) {
+      case 'show':
+        this.onShowDelivery();
+        break;
+      case 'insert':
+        this.showDialog();
+        break;
+      case 'update':
+        this.showUpdateDialog();
+        break;
+      case 'delete':
+        this.deleteDelivery();
+        break;
+      case 'exportPdf':
+      case 'exportExcel':
+        this.exportToExcel();
+        break;
+      case 'grid':
+        this.exportToPDF();
+        break;
+      case 'code':
+        this.exportToHTML();
+        break;
+      case 'database':
+        this.exportToJSON();
+        break;
+      case 'logout':
+        this.onLogout();
+        break;
+    }
   }
 
   getLogoPath(): string {
@@ -329,7 +376,7 @@ export class DeliveryComponent implements OnInit {
   }
 
   exportToExcel() {
-    this.exportService.exportToExcel(this.deliveries, 'deliveries'); // ← DOBRZE!
+    this.exportService.exportToExcel(this.deliveries, 'deliveries');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -338,12 +385,12 @@ export class DeliveryComponent implements OnInit {
     });
   }
 
-  exportToXLS() {
-    this.exportService.exportToXLS(this.deliveries, 'deliveries');
+  exportToPDF() {
+    this.exportService.exportToPDF(this.deliveries, 'transactions', 'Transaction List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
-      detail: 'Data exported to XLS successfully',
+      detail: 'Data exported to PDF successfully',
       life: 2000
     });
   }

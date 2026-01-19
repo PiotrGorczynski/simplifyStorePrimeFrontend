@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -15,9 +15,11 @@ import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 import { ExportService } from '../../services/export.service';
 import { fadeInOut } from '../../../animations';
 import { ThemeService } from '../../services/theme.service';
+import { ActionService, ActionType } from '../../services/action.service';
 
 interface Customer {
   id: number;
@@ -56,13 +58,15 @@ interface Customer {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   products: Customer[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
   selectedCustomerId: number | null = null;
   selectedCustomer: Customer | null = null;
   isDarkMode = false;
+
+  private actionSubscription: Subscription | null = null;
 
   newProduct: Partial<Customer> = {
     info: '',
@@ -103,7 +107,8 @@ export class DashboardComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private exportService: ExportService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private actionService: ActionService
   ) {}
 
   ngOnInit() {
@@ -349,9 +354,56 @@ export class DashboardComponent implements OnInit {
         supportRequests: '4 pending'
       }
     ];
+
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
+
+    this.actionSubscription = this.actionService.action$.subscribe((action: ActionType) => {
+      this.handleAction(action);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.actionSubscription) {
+      this.actionSubscription.unsubscribe();
+    }
+  }
+
+  private handleAction(action: ActionType): void {
+    console.log('Received action:', action);
+    switch (action) {
+      case 'show':
+        this.onShowCustomer();
+        break;
+      case 'insert':
+        this.showDialog();
+        break;
+      case 'update':
+        this.showUpdateDialog();
+        break;
+      case 'delete':
+        this.deleteProduct();
+        break;
+      case 'exportPdf':
+        this.exportToExcel();
+        break;
+      case 'exportExcel':
+        this.exportToExcel();
+        break;
+      case 'grid':
+        this.exportToPDF();
+        break;
+      case 'code':
+        this.exportToHTML();
+        break;
+      case 'database':
+        this.exportToJSON();
+        break;
+      case 'logout':
+        this.onLogout();
+        break;
+    }
   }
 
   getLogoPath(): string {
@@ -546,12 +598,12 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  exportToXLS() {
-    this.exportService.exportToXLS(this.products, 'customers');
+  exportToPDF() {
+    this.exportService.exportToPDF(this.products, 'transactions', 'Transaction List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
-      detail: 'Data exported to XLS successfully',
+      detail: 'Data exported to PDF successfully',
       life: 2000
     });
   }

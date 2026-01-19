@@ -15,13 +15,72 @@
     (click)="closeSidebar()">
   </div>
 
+  <div
+    class="action-panel-overlay"
+    [class.visible]="actionPanelVisible"
+    (click)="closeActionPanel()">
+  </div>
+
   <div class="layout-sidebar" [class.mobile-visible]="sidebarVisible">
     <app-sidebar (menuItemClicked)="closeSidebar()"></app-sidebar>
   </div>
 
-  <div class="layout-content">
+  <div class="layout-content"
+       (touchstart)="onTouchStart($event)"
+       (touchend)="onTouchEnd($event)">
     <div class="content-container">
       <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <div class="action-panel-mobile" [class.mobile-visible]="actionPanelVisible">
+    <div class="action-panel-content">
+      <div class="action-panel-header">
+        <img [src]="getLogoPath()" alt="Logo" class="main-logo">
+      </div>
+
+      <div class="action-buttons-mobile">
+        <button pButton class="p-button-rounded p-button-info" (click)="emitAction('show')">
+          <i class="pi pi-eye"></i>
+          <span>SHOW</span>
+        </button>
+        <button pButton class="p-button-rounded p-button-success" (click)="emitAction('insert')">
+          <i class="pi pi-plus"></i>
+          <span>INSERT</span>
+        </button>
+        <button pButton class="p-button-rounded p-button-warning" (click)="emitAction('update')">
+          <i class="pi pi-refresh"></i>
+          <span>UPDATE</span>
+        </button>
+        <button pButton class="p-button-rounded p-button-danger" (click)="emitAction('delete')">
+          <i class="pi pi-trash"></i>
+          <span>DELETE</span>
+        </button>
+      </div>
+
+      <div class="export-section-mobile">
+        <span class="export-title">EXPORT & SYSTEM</span>
+        <div class="export-grid-mobile">
+          <button pButton class="p-button-text p-button-plain" (click)="emitAction('exportPdf')">
+            <i class="pi pi-file-pdf"></i>
+          </button>
+          <button pButton class="p-button-text p-button-plain" (click)="emitAction('exportExcel')">
+            <i class="pi pi-file-excel"></i>
+          </button>
+          <button pButton class="p-button-text p-button-plain" (click)="emitAction('grid')">
+            <i class="pi pi-th-large"></i>
+          </button>
+          <button pButton class="p-button-text p-button-plain" (click)="emitAction('code')">
+            <i class="pi pi-code"></i>
+          </button>
+          <button pButton class="p-button-text p-button-plain" (click)="emitAction('database')">
+            <i class="pi pi-database"></i>
+          </button>
+          <button pButton class="p-button-text p-button-plain logout-btn" (click)="emitAction('logout')">
+            <i class="pi pi-power-off"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

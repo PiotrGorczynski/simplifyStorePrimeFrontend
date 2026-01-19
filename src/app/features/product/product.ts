@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -15,9 +15,10 @@ import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 import { ExportService } from '../../services/export.service';
-import { fadeInOut } from '../../../animations';
 import { ThemeService } from '../../services/theme.service';
+import { ActionService, ActionType } from '../../services/action.service';
 
 export interface Product {
   id: number;
@@ -52,17 +53,18 @@ export interface Product {
     ToastModule
   ],
   providers: [ConfirmationService, MessageService],
-  animations: [fadeInOut],
   templateUrl: './product.html',
   styleUrl: './product.scss'
 })
-export class ProductComponent implements OnInit {
+export class ProductComponent implements OnInit, OnDestroy {
   products: Product[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
   selectedProductId: number | null = null;
   selectedProduct: Product | null = null;
   isDarkMode = false;
+
+  private actionSubscription: Subscription | null = null;
 
   newProduct: Partial<Product> = {
     name: '',
@@ -92,7 +94,8 @@ export class ProductComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private exportService: ExportService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private actionService: ActionService
   ) {}
 
   ngOnInit() {
@@ -342,6 +345,49 @@ export class ProductComponent implements OnInit {
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
+
+    this.actionSubscription = this.actionService.action$.subscribe((action: ActionType) => {
+      this.handleAction(action);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.actionSubscription) {
+      this.actionSubscription.unsubscribe();
+    }
+  }
+
+  private handleAction(action: ActionType): void {
+    switch (action) {
+      case 'show':
+        this.onShowProduct();
+        break;
+      case 'insert':
+        this.showDialog();
+        break;
+      case 'update':
+        this.showUpdateDialog();
+        break;
+      case 'delete':
+        this.deleteProduct();
+        break;
+      case 'exportPdf':
+      case 'exportExcel':
+        this.exportToExcel();
+        break;
+      case 'grid':
+        this.exportToPDF();
+        break;
+      case 'code':
+        this.exportToHTML();
+        break;
+      case 'database':
+        this.exportToJSON();
+        break;
+      case 'logout':
+        this.onLogout();
+        break;
+    }
   }
 
   getLogoPath(): string {
@@ -541,18 +587,18 @@ export class ProductComponent implements OnInit {
     });
   }
 
-  exportToXLS() {
-    this.exportService.exportToXLS(this.products, 'customers');
+  exportToPDF() {
+    this.exportService.exportToPDF(this.products, 'transactions', 'Transaction List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
-      detail: 'Data exported to XLS successfully',
+      detail: 'Data exported to PDF successfully',
       life: 2000
     });
   }
 
   exportToExcel() {
-    this.exportService.exportToExcel(this.products, 'customers');
+    this.exportService.exportToExcel(this.products, 'products');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -562,7 +608,7 @@ export class ProductComponent implements OnInit {
   }
 
   exportToCSV() {
-    this.exportService.exportToCSV(this.products, 'customers');
+    this.exportService.exportToCSV(this.products, 'products');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -572,7 +618,7 @@ export class ProductComponent implements OnInit {
   }
 
   exportToJSON() {
-    this.exportService.exportToJSON(this.products, 'customers');
+    this.exportService.exportToJSON(this.products, 'products');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -582,7 +628,7 @@ export class ProductComponent implements OnInit {
   }
 
   exportToHTML() {
-    this.exportService.exportToHTML(this.products, 'customers', 'Customer List');
+    this.exportService.exportToHTML(this.products, 'products', 'Product List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
