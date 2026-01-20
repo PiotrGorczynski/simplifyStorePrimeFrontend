@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { AnalyticsService, AnalyticsData } from '../services/analytics.service';
@@ -10,6 +10,8 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { fadeInOut } from '../../animations';
 import { ThemeService } from '../services/theme.service';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 Chart.register(...registerables);
 
@@ -189,7 +191,7 @@ export class AnalyticsComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: "Error",
+          detail: this.errorMessage || 'Unknown error',
           life: 3000
         });
       }
@@ -326,52 +328,28 @@ export class AnalyticsComponent implements OnInit {
         },
         scales: {
           x: {
-            ticks: {
-              color: colors.text
-            },
-            grid: {
-              color: colors.grid
-            }
+            ticks: { color: colors.text },
+            grid: { color: colors.grid }
           },
           y: {
             type: 'linear',
             display: true,
             position: 'left',
-            title: {
-              display: true,
-              text: 'Count',
-              color: colors.text
-            },
-            ticks: {
-              color: colors.text
-            },
-            grid: {
-              color: colors.grid
-            }
+            title: { display: true, text: 'Count', color: colors.text },
+            ticks: { color: colors.text },
+            grid: { color: colors.grid }
           },
           y1: {
             type: 'linear',
             display: true,
             position: 'right',
-            title: {
-              display: true,
-              text: 'Revenue ($)',
-              color: colors.text
-            },
-            ticks: {
-              color: colors.text
-            },
-            grid: {
-              drawOnChartArea: false
-            }
+            title: { display: true, text: 'Revenue ($)', color: colors.text },
+            ticks: { color: colors.text },
+            grid: { drawOnChartArea: false }
           }
         },
         plugins: {
-          legend: {
-            labels: {
-              color: colors.text
-            }
-          },
+          legend: { labels: { color: colors.text } },
           title: {
             display: true,
             text: 'Transactions Over Time (Last 7 Days)',
@@ -419,9 +397,7 @@ export class AnalyticsComponent implements OnInit {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: {
-              color: colors.text
-            }
+            labels: { color: colors.text }
           },
           title: {
             display: true,
@@ -476,26 +452,16 @@ export class AnalyticsComponent implements OnInit {
         maintainAspectRatio: false,
         scales: {
           x: {
-            ticks: {
-              color: colors.text
-            },
-            grid: {
-              color: colors.grid
-            }
+            ticks: { color: colors.text },
+            grid: { color: colors.grid }
           },
           y: {
-            ticks: {
-              color: colors.text
-            },
-            grid: {
-              color: colors.grid
-            }
+            ticks: { color: colors.text },
+            grid: { color: colors.grid }
           }
         },
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           title: {
             display: true,
             text: 'Top 5 Products by Revenue',
@@ -509,5 +475,176 @@ export class AnalyticsComponent implements OnInit {
 
   refreshData(): void {
     this.loadAnalytics();
+  }
+
+  exportToPDF(): void {
+    if (!this.analyticsData) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFontSize(22);
+    doc.setTextColor(74, 20, 140);
+    doc.text('Analytics Report', pageWidth / 2, 20, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text('Simplify Store Prime', pageWidth / 2, 28, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.setTextColor(150);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, 35, { align: 'center' });
+
+    doc.setDrawColor(124, 77, 255);
+    doc.setLineWidth(0.5);
+    doc.line(14, 40, pageWidth - 14, 40);
+
+    doc.setFontSize(14);
+    doc.setTextColor(74, 20, 140);
+    doc.text('Summary Statistics', 14, 50);
+
+    autoTable(doc, {
+      startY: 55,
+      head: [['Metric', 'Value']],
+      body: [
+        ['Total Sales', `$${this.analyticsData.totalSales.toFixed(2)}`],
+        ['Total Customers', this.analyticsData.totalCustomers.toString()],
+        ['Total Products', this.analyticsData.totalProducts.toString()],
+        ['Total Deliveries', this.analyticsData.totalDeliveries.toString()],
+        ['Recent Transactions', this.analyticsData.recentTransactions.toString()]
+      ],
+      headStyles: { fillColor: [124, 77, 255], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 255] },
+      styles: { fontSize: 10 }
+    });
+
+    let currentY = (doc as any).lastAutoTable.finalY + 15;
+    doc.setFontSize(14);
+    doc.setTextColor(74, 20, 140);
+    doc.text('Payment Methods', 14, currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [['Method', 'Count', 'Amount']],
+      body: this.analyticsData.paymentMethods.map((pm: any) => [
+        pm.method.charAt(0).toUpperCase() + pm.method.slice(1),
+        pm.count.toString(),
+        `$${pm.amount.toFixed(2)}`
+      ]),
+      headStyles: { fillColor: [124, 77, 255], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 255] },
+      styles: { fontSize: 10 }
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+    doc.setFontSize(14);
+    doc.setTextColor(74, 20, 140);
+    doc.text('Transaction Status', 14, currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [['Status', 'Count', 'Percentage']],
+      body: this.analyticsData.transactionsByStatus.map((ts: any) => {
+        const total = this.analyticsData!.transactionsByStatus.reduce((sum: number, item: any) => sum + item.count, 0);
+        const percentage = ((ts.count / total) * 100).toFixed(1);
+        return [
+          ts.status.charAt(0).toUpperCase() + ts.status.slice(1),
+          ts.count.toString(),
+          `${percentage}%`
+        ];
+      }),
+      headStyles: { fillColor: [124, 77, 255], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 255] },
+      styles: { fontSize: 10 }
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+    if (currentY > 220) { doc.addPage(); currentY = 20; }
+
+    doc.setFontSize(14);
+    doc.setTextColor(74, 20, 140);
+    doc.text('Top Products by Revenue', 14, currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [['#', 'Product', 'Quantity Sold', 'Revenue']],
+      body: this.analyticsData.topProducts.map((tp: any, index: number) => [
+        (index + 1).toString(),
+        tp.name,
+        tp.quantity.toString(),
+        `$${tp.revenue.toFixed(2)}`
+      ]),
+      headStyles: { fillColor: [124, 77, 255], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 255] },
+      styles: { fontSize: 10 }
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+    if (currentY > 220) { doc.addPage(); currentY = 20; }
+
+    doc.setFontSize(14);
+    doc.setTextColor(74, 20, 140);
+    doc.text('Transactions by Date (Last 7 Days)', 14, currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [['Date', 'Transactions', 'Revenue']],
+      body: this.analyticsData.transactionsByDate.map((td: any) => [
+        td.date,
+        td.count.toString(),
+        `$${td.amount.toFixed(2)}`
+      ]),
+      headStyles: { fillColor: [124, 77, 255], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 255] },
+      styles: { fontSize: 10 }
+    });
+
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(
+        `Simplify Store Prime - Analytics Report - Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        doc.internal.pageSize.getHeight() - 10,
+        { align: 'center' }
+      );
+    }
+
+    doc.save(`analytics-report-${new Date().toISOString().split('T')[0]}.pdf`);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Analytics report exported to PDF successfully',
+      life: 2000
+    });
+  }
+
+  exportToJSON(): void {
+    if (!this.analyticsData) return;
+
+    const exportData = {
+      generatedAt: new Date().toISOString(),
+      application: 'Simplify Store Prime',
+      data: this.analyticsData
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `analytics-data-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Exported',
+      detail: 'Analytics data exported to JSON successfully',
+      life: 2000
+    });
   }
 }

@@ -9,6 +9,17 @@ h1 {
   font-weight: 700;
 }
 
+.export-bar {
+  display: flex;
+  gap: 0.5rem;
+
+  .p-button {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -153,14 +164,17 @@ h1 {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: white;
+  border: 2px solid #e0e0e0;
 
   ::ng-deep .p-card-header {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
+    background: #f8f9fa;
   }
 
   ::ng-deep .p-card-body {
     padding: 1.5rem;
+    background: #ffffff;
   }
 
   .chart-header {
@@ -204,9 +218,15 @@ h1 {
 
     .chart-card {
       background: #252526 !important;
+      border-color: #3e3e42 !important;
 
       .p-card-header {
         border-bottom-color: #3e3e42 !important;
+        background: #2d2d30 !important;
+      }
+
+      .p-card-body {
+        background: #252526 !important;
       }
 
       .chart-header {
@@ -233,10 +253,17 @@ h1 {
 @media (max-width: 768px) {
   .analytics-container {
     padding: 1rem;
+    padding-top: 70px;
   }
 
   h1 {
     font-size: 1.5rem;
+  }
+
+  .export-bar {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .stat-value {
