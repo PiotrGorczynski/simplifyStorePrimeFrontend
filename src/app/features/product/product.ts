@@ -63,6 +63,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   selectedProductId: number | null = null;
   selectedProduct: Product | null = null;
   isDarkMode = false;
+  submitted: boolean = false;
 
   private actionSubscription: Subscription | null = null;
 
@@ -397,6 +398,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   showDialog() {
     this.isEditMode = false;
     this.selectedProductId = null;
+    this.submitted = false;
     this.newProduct = {
       name: '',
       code: '',
@@ -423,6 +425,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     }
 
     this.isEditMode = true;
+    this.submitted = false;
     this.selectedProductId = this.selectedProduct.id;
     this.newProduct = {
       name: this.selectedProduct.name,
@@ -439,6 +442,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   saveProduct() {
+    this.submitted = true;
     if (!this.isFormValid()) {
       this.messageService.add({
         severity: 'error',
@@ -475,7 +479,7 @@ export class ProductComponent implements OnInit, OnDestroy {
         life: 3000
       });
     }
-
+    this.submitted = false;
     this.displayDialog = false;
   }
 
@@ -528,6 +532,7 @@ export class ProductComponent implements OnInit, OnDestroy {
   }
 
   closeDialog() {
+    this.submitted = false;
     this.displayDialog = false;
   }
 

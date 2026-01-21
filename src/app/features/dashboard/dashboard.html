@@ -36,6 +36,20 @@
                 <td>{{product.supportRequests}}</td>
               </tr>
             </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="10">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">
+                      <i class="pi pi-users"></i>
+                    </div>
+                    <h3 class="empty-state-title">No customers yet</h3>
+                    <p class="empty-state-message">Start by adding your first customer to the system.</p>
+                    <p-button label="Add First Customer" icon="pi pi-plus" severity="success" (onClick)="showDialog()"></p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
           </p-table>
         </p-card>
       </div>
@@ -100,18 +114,24 @@
   <p-dialog [header]="getDialogHeader()" [(visible)]="displayDialog" [modal]="true" [style]="{width: '600px'}" styleClass="custom-dialog">
     <ng-template pTemplate="content">
       <div class="dialog-form-container">
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !newProduct.info?.trim()">
           <i class="pi pi-info-circle field-icon"></i>
           <label class="field-label">INFO *</label>
           <div class="field-input">
             <input type="text" pInputText [(ngModel)]="newProduct.info" placeholder="Customer name or ID" class="w-full" />
+            <small *ngIf="submitted && !newProduct.info?.trim()" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Customer info is required
+            </small>
           </div>
         </div>
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !newProduct.salesOrder">
           <i class="pi pi-shopping-cart field-icon"></i>
           <label class="field-label">SALES ORDERS *</label>
           <div class="field-input">
             <p-select [(ngModel)]="newProduct.salesOrder" [options]="orderOptions" optionLabel="label" optionValue="value" placeholder="Select order type" styleClass="w-full"></p-select>
+            <small *ngIf="submitted && !newProduct.salesOrder" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Please select an order type
+            </small>
           </div>
         </div>
         <div class="field-row">
@@ -128,18 +148,27 @@
             <p-select [(ngModel)]="newProduct.paymentHistory" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
           </div>
         </div>
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !isEmailValid()">
           <i class="pi pi-envelope field-icon"></i>
           <label class="field-label">EMAIL *</label>
           <div class="field-input">
             <input type="email" pInputText [(ngModel)]="newProduct.communication" placeholder="customer@example.com" class="w-full" />
+            <small *ngIf="submitted && !newProduct.communication?.trim()" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Email is required
+            </small>
+            <small *ngIf="submitted && newProduct.communication?.trim() && !isValidEmailFormat()" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Please enter a valid email address
+            </small>
           </div>
         </div>
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !newProduct.category">
           <i class="pi pi-tag field-icon"></i>
           <label class="field-label">CATEGORY *</label>
           <div class="field-input">
             <p-select [(ngModel)]="newProduct.category" [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" styleClass="w-full"></p-select>
+            <small *ngIf="submitted && !newProduct.category" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Please select a category
+            </small>
           </div>
         </div>
         <div class="field-row has-textarea">
@@ -171,7 +200,7 @@
     <ng-template pTemplate="footer">
       <div class="flex justify-content-end gap-2">
         <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
-        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveProduct()" [disabled]="!isFormValid()"></p-button>
+        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveProduct()"></p-button>
       </div>
     </ng-template>
   </p-dialog>

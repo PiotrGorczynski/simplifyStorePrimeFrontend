@@ -65,6 +65,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedCustomerId: number | null = null;
   selectedCustomer: Customer | null = null;
   isDarkMode = false;
+  submitted: boolean = false;
 
   private actionSubscription: Subscription | null = null;
 
@@ -413,6 +414,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showDialog() {
     this.isEditMode = false;
     this.selectedCustomerId = null;
+    this.submitted = false;
     this.newProduct = {
       info: '',
       salesOrder: '',
@@ -439,6 +441,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     this.isEditMode = true;
+    this.submitted = false;
     this.selectedCustomerId = this.selectedCustomer.id;
     this.newProduct = {
       info: this.selectedCustomer.info,
@@ -455,6 +458,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   saveProduct() {
+    this.submitted = true;
     if (!this.isFormValid()) {
       this.messageService.add({
         severity: 'error',
@@ -491,7 +495,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         life: 3000
       });
     }
-
+    this.submitted = false;
     this.displayDialog = false;
   }
 
@@ -544,6 +548,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   closeDialog() {
+    this.submitted = false;
     this.displayDialog = false;
   }
 
@@ -552,8 +557,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.newProduct.info &&
       this.newProduct.info.trim() !== '' &&
       this.newProduct.salesOrder &&
-      this.newProduct.category
-    );
+      this.newProduct.category &&
+      this.isEmailValid()
+  );
+  }
+
+  isEmailValid(): boolean {
+    if (!this.newProduct.communication || !this.newProduct.communication.trim()) {
+      return false;
+    }
+    return this.isValidEmailFormat();
+  }
+
+  isValidEmailFormat(): boolean {
+    if (!this.newProduct.communication) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(this.newProduct.communication);
   }
 
   getDialogHeader(): string {

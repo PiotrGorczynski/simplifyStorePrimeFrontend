@@ -1,0 +1,46 @@
+<div class="not-found-container" [class.dark-mode]="isDarkMode">
+  <div class="not-found-content">
+    <div class="error-code">
+      <span class="digit">4</span>
+      <span class="digit zero">
+        <i class="pi pi-ban"></i>
+      </span>
+      <span class="digit">4</span>
+    </div>
+
+    <h1 class="error-title">Page Not Found</h1>
+
+    <p class="error-message">
+      Oops! The page you're looking for doesn't exist or has been moved.
+    </p>
+
+    <div class="error-illustration">
+      <i class="pi pi-map"></i>
+      <span class="illustration-text">Lost in the store?</span>
+    </div>
+
+    <div class="action-buttons">
+      <p-button
+        label="Go to Dashboard"
+        icon="pi pi-home"
+        severity="info"
+        (onClick)="goHome()"
+        styleClass="p-button-lg">
+      </p-button>
+
+      <p-button
+        label="Go Back"
+        icon="pi pi-arrow-left"
+        [outlined]="true"
+        severity="info"
+        (onClick)="goBack()"
+        styleClass="p-button-lg">
+      </p-button>
+    </div>
+
+    <div class="login-link">
+      <span>Or </span>
+      <a (click)="goLogin()" class="link">return to login page</a>
+    </div>
+  </div>
+</div>

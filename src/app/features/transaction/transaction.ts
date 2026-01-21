@@ -76,6 +76,7 @@ export class TransactionComponent implements OnInit {
   selectedTransactionId: number | null = null;
   selectedTransaction: TransactionModel | null = null;
   isDarkMode = false;
+  submitted: boolean = false;
 
   expandedRowIds: Set<number> = new Set();
 
@@ -329,6 +330,7 @@ export class TransactionComponent implements OnInit {
 
   showDialog() {
     this.isEditMode = false;
+    this.submitted = false;
     this.selectedTransactionId = null;
     this.newTransaction = {
       date: new Date(),
@@ -357,6 +359,7 @@ export class TransactionComponent implements OnInit {
     }
 
     this.isEditMode = true;
+    this.submitted = false;
     this.selectedTransactionId = this.selectedTransaction.id;
     this.newTransaction = {
       date: new Date(this.selectedTransaction.date),
@@ -421,6 +424,7 @@ export class TransactionComponent implements OnInit {
   }
 
   saveTransaction() {
+    this.submitted = true;
     if (!this.isFormValid()) {
       this.messageService.add({
         severity: 'error',
@@ -462,7 +466,7 @@ export class TransactionComponent implements OnInit {
         life: 3000
       });
     }
-
+    this.submitted = false;
     this.displayDialog = false;
   }
 
@@ -511,6 +515,7 @@ export class TransactionComponent implements OnInit {
   }
 
   closeDialog() {
+    this.submitted = false;
     this.displayDialog = false;
   }
 

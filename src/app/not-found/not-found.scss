@@ -1,0 +1,143 @@
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+  padding: 2rem;
+
+  &.dark-mode {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+
+    .error-title,
+    .error-message,
+    .illustration-text {
+      color: #e0e0e0;
+    }
+
+    .error-code .digit {
+      color: #4fc3f7;
+      text-shadow: 0 0 30px rgba(79, 195, 247, 0.3);
+
+      &.zero i {
+        color: #ef5350;
+      }
+    }
+
+    .login-link {
+      color: #9e9e9e;
+
+      .link {
+        color: #4fc3f7;
+
+        &:hover {
+          color: #81d4fa;
+        }
+      }
+    }
+  }
+}
+
+.not-found-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.error-code {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  .digit {
+    font-size: 8rem;
+    font-weight: 800;
+    color: #3b82f6;
+    line-height: 1;
+    text-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+
+    @media (max-width: 480px) {
+      font-size: 5rem;
+    }
+
+    &.zero {
+      position: relative;
+
+      i {
+        font-size: 6rem;
+        color: #ef4444;
+
+        @media (max-width: 480px) {
+          font-size: 4rem;
+        }
+      }
+    }
+  }
+}
+
+.error-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
+}
+
+.error-message {
+  font-size: 1.1rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.error-illustration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  opacity: 0.7;
+
+  i {
+    font-size: 3rem;
+    color: #94a3b8;
+  }
+
+  .illustration-text {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    font-style: italic;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  ::ng-deep .p-button {
+    min-width: 160px;
+  }
+}
+
+.login-link {
+  font-size: 0.9rem;
+  color: #64748b;
+
+  .link {
+    color: #3b82f6;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #2563eb;
+    }
+  }
+}

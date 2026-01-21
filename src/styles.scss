@@ -564,3 +564,83 @@ html {
     }
   }
 }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+
+  .empty-state-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    i {
+      font-size: 2.5rem;
+      color: #6366f1;
+    }
+  }
+
+  .empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .empty-state-message {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0 0 1.5rem 0;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+}
+
+.dark-mode .empty-state {
+  .empty-state-icon {
+    background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);
+    i { color: #a5b4fc; }
+  }
+  .empty-state-title { color: #e2e8f0; }
+  .empty-state-message { color: #94a3b8; }
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+  animation: fadeInError 0.2s ease;
+
+  i { font-size: 0.75rem; }
+}
+
+@keyframes fadeInError {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.field-row.field-invalid {
+  .field-input {
+    input, textarea, .p-select {
+      border-color: #ef4444 !important;
+    }
+  }
+  .field-icon { color: #ef4444; }
+}
+
+.p-inputtext.ng-invalid.ng-dirty,
+.p-select.ng-invalid.ng-dirty {
+  border-color: #ef4444;
+}

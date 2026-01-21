@@ -58,6 +58,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   selectedDeliveryId: number | null = null;
   selectedDelivery: DeliveryModel | null = null;
   isDarkMode = false;
+  submitted: boolean = false;
 
   private actionSubscription: Subscription | null = null;
 
@@ -185,6 +186,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
 
   showDialog() {
     this.isEditMode = false;
+    this.submitted = false;
     this.selectedDeliveryId = null;
     this.newDelivery = {
       deliveryType: '',
@@ -207,6 +209,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
     }
 
     this.isEditMode = true;
+    this.submitted = false;
     this.selectedDeliveryId = this.selectedDelivery.id;
     this.newDelivery = {
       deliveryType: this.selectedDelivery.deliveryType,
@@ -218,6 +221,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   }
 
   saveDelivery() {
+    this.submitted = true;
     if (!this.isFormValid()) {
       this.messageService.add({
         severity: 'error',
@@ -254,7 +258,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
         life: 3000
       });
     }
-
+    this.submitted = false;
     this.displayDialog = false;
   }
 
@@ -307,6 +311,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   }
 
   closeDialog() {
+    this.submitted = false;
     this.displayDialog = false;
   }
 

@@ -5,10 +5,11 @@ import { ProductComponent } from './features/product/product';
 import { DeliveryComponent } from './features/delivery/delivery';
 import { TransactionComponent } from './features/transaction/transaction';
 import { AnalyticsComponent } from './analytics/analytics';
-import { authGuard } from './guards/auth-guard.spec';
+import { authGuard } from './guards/auth-guard';
 import { ForgotPasswordComponent } from './login/forgot-password/forgot-password';
 import { SignUpComponent } from './login/sign-up/sign-up';
 import { MainLayoutComponent } from './components/layout/main-layout/main-layout';
+import { NotFoundComponent } from './not-found/not-found';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -27,5 +28,5 @@ export const routes: Routes = [
       { path: 'analytics', component: AnalyticsComponent },
     ]
   },
-  { path: '**', redirectTo: '/login' }
+  { path: '**', component: NotFoundComponent }
 ];

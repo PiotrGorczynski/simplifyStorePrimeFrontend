@@ -6,7 +6,7 @@
     <div class="grid align-items-stretch m-0 g-2">
 
       <div class="col-12 lg:col-10 p-2 table-column">
-      <p-card class="shadow-2 border-round-xl m-0 h-full">
+        <p-card class="shadow-2 border-round-xl m-0 h-full">
           <p-table
             [value]="transactions"
             [rows]="20"
@@ -100,12 +100,27 @@
                 </tr>
               }
             </ng-template>
+
+            <ng-template>
+              <tr>
+                <td colspan="10">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">
+                      <i class="pi pi-wallet"></i>
+                    </div>
+                    <h3 class="empty-state-title">No transactions yet</h3>
+                    <p class="empty-state-message">Start by adding your first transaction to the system.</p>
+                    <p-button label="Add First Transaction" icon="pi pi-plus" severity="success" (onClick)="showDialog()"></p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
           </p-table>
         </p-card>
       </div>
 
       <div class="col-12 lg:col-2 p-2 operations-panel-desktop">
-      <p-card class="shadow-2 border-round-xl m-0 h-full operations-card">
+        <p-card class="shadow-2 border-round-xl m-0 h-full operations-card">
           <div class="flex justify-content-center pt-4 mb-2">
             <img [src]="getLogoPath()" alt="Logo" class="main-logo">
           </div>
@@ -166,17 +181,20 @@
       <div class="dialog-form-container">
         <div class="grid">
           <div class="col-6">
-            <div class="field-row">
+            <div class="field-row" [class.field-invalid]="submitted && !newTransaction.date">
               <i class="pi pi-calendar field-icon"></i>
               <label class="field-label">DATE *</label>
               <div class="field-input">
                 <p-datepicker [(ngModel)]="newTransaction.date" dateFormat="dd-mm-yy" [showIcon]="true" class="w-full"></p-datepicker>
+                <small *ngIf="submitted && !newTransaction.date" class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Date is required
+                </small>
               </div>
             </div>
           </div>
 
           <div class="col-6">
-            <div class="field-row">
+            <div class="field-row" [class.field-invalid]="submitted && !newTransaction.customerId">
               <i class="pi pi-users field-icon"></i>
               <label class="field-label">CUSTOMER *</label>
               <div class="field-input">
@@ -188,6 +206,9 @@
                   placeholder="Select customer"
                   class="w-full">
                 </p-select>
+                <small *ngIf="submitted && !newTransaction.customerId" class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Please select a customer
+                </small>
               </div>
             </div>
           </div>
@@ -195,7 +216,7 @@
 
         <div class="grid">
           <div class="col-6">
-            <div class="field-row">
+            <div class="field-row" [class.field-invalid]="submitted && !newTransaction.type">
               <i class="pi pi-tag field-icon"></i>
               <label class="field-label">TYPE *</label>
               <div class="field-input">
@@ -207,12 +228,15 @@
                   placeholder="Select type"
                   class="w-full">
                 </p-select>
+                <small *ngIf="submitted && !newTransaction.type" class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Please select a type
+                </small>
               </div>
             </div>
           </div>
 
           <div class="col-6">
-            <div class="field-row">
+            <div class="field-row" [class.field-invalid]="submitted && !newTransaction.paymentMethod">
               <i class="pi pi-credit-card field-icon"></i>
               <label class="field-label">PAYMENT *</label>
               <div class="field-input">
@@ -224,6 +248,9 @@
                   placeholder="Select payment method"
                   class="w-full">
                 </p-select>
+                <small *ngIf="submitted && !newTransaction.paymentMethod" class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Please select a payment method
+                </small>
               </div>
             </div>
           </div>
@@ -231,7 +258,7 @@
 
         <div class="grid">
           <div class="col-6">
-            <div class="field-row">
+            <div class="field-row" [class.field-invalid]="submitted && !newTransaction.status">
               <i class="pi pi-check-circle field-icon"></i>
               <label class="field-label">STATUS *</label>
               <div class="field-input">
@@ -243,6 +270,9 @@
                   placeholder="Select status"
                   class="w-full">
                 </p-select>
+                <small *ngIf="submitted && !newTransaction.status" class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Please select a status
+                </small>
               </div>
             </div>
           </div>
@@ -354,7 +384,7 @@
     <ng-template #footer>
       <div class="flex justify-content-end gap-2">
         <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
-        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveTransaction()" [disabled]="!isFormValid()"></p-button>
+        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveTransaction()"></p-button>
       </div>
     </ng-template>
   </p-dialog>

@@ -40,6 +40,21 @@
                 <td class="font-semibold">{{delivery.provider}}</td>
               </tr>
             </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">
+                  <div class="empty-state">
+                    <div class="empty-state-icon">
+                      <i class="pi pi-truck"></i>
+                    </div>
+                    <h3 class="empty-state-title">No deliveries yet</h3>
+                    <p class="empty-state-message">Start by adding your first delivery to the system.</p>
+                    <p-button label="Add First Delivery" icon="pi pi-plus" severity="success" (onClick)="showDialog()"></p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
           </p-table>
         </p-card>
       </div>
@@ -104,7 +119,7 @@
   <p-dialog [header]="getDialogHeader()" [(visible)]="displayDialog" [modal]="true" [style]="{width: '600px'}" styleClass="custom-dialog">
     <ng-template pTemplate="content">
       <div class="dialog-form-container">
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !newDelivery.transactionId">
           <i class="pi pi-hashtag field-icon"></i>
           <label class="field-label">TRANSACTION ID *</label>
           <div class="field-input">
@@ -116,10 +131,13 @@
               [min]="1"
               placeholder="Transaction ID">
             </p-inputNumber>
+            <small *ngIf="submitted && !newDelivery.transactionId" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Transaction ID is required
+            </small>
           </div>
         </div>
 
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !newDelivery.deliveryType">
           <i class="pi pi-send field-icon"></i>
           <label class="field-label">DELIVERY TYPE *</label>
           <div class="field-input">
@@ -131,10 +149,13 @@
               placeholder="Select delivery type"
               styleClass="w-full">
             </p-select>
+            <small *ngIf="submitted && !newDelivery.deliveryType" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Please select a delivery type
+            </small>
           </div>
         </div>
 
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !newDelivery.status">
           <i class="pi pi-check-circle field-icon"></i>
           <label class="field-label">STATUS *</label>
           <div class="field-input">
@@ -146,10 +167,13 @@
               placeholder="Select status"
               styleClass="w-full">
             </p-select>
+            <small *ngIf="submitted && !newDelivery.status" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Please select a status
+            </small>
           </div>
         </div>
 
-        <div class="field-row">
+        <div class="field-row" [class.field-invalid]="submitted && !newDelivery.provider">
           <i class="pi pi-truck field-icon"></i>
           <label class="field-label">PROVIDER *</label>
           <div class="field-input">
@@ -161,6 +185,9 @@
               placeholder="Select provider"
               styleClass="w-full">
             </p-select>
+            <small *ngIf="submitted && !newDelivery.provider" class="field-error">
+              <i class="pi pi-exclamation-circle"></i> Please select a provider
+            </small>
           </div>
         </div>
 
@@ -172,7 +199,7 @@
     <ng-template pTemplate="footer">
       <div class="flex justify-content-end gap-2">
         <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
-        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveDelivery()" [disabled]="!isFormValid()"></p-button>
+        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveDelivery()"></p-button>
       </div>
     </ng-template>
   </p-dialog>
