@@ -5,14 +5,17 @@ import { ButtonModule } from 'primeng/button';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { ThemeService } from '../../../services/theme.service';
 import { ActionService } from '../../../services/action.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, SidebarComponent, ButtonModule],
+  imports: [RouterOutlet, CommonModule, SidebarComponent, ButtonModule, ToastModule],
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.scss'
+  styleUrl: './main-layout.scss',
+  providers: [MessageService]
 })
 export class MainLayoutComponent implements OnInit {
   sidebarVisible = false;

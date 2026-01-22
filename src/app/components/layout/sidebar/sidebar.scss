@@ -189,3 +189,37 @@
     }
   }
 }
+
+.mobile-logout-section {
+  display: none;
+  padding: 1rem;
+  border-top: 1px solid var(--surface-border);
+  margin-top: auto;
+
+  button {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  .mobile-logout-section {
+    display: block;
+  }
+}
+
+::ng-deep .logout-menu-item {
+  .p-menuitem-link {
+    &:hover {
+      background: rgba(239, 68, 68, 0.1) !important;
+
+      .p-menuitem-icon, .p-menuitem-text {
+        color: #ef4444 !important;
+      }
+    }
+  }
+}

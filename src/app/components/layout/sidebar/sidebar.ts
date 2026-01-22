@@ -1,7 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, ConfirmationService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
@@ -13,7 +14,7 @@ import { ThemeService } from '../../../services/theme.service';
 import { InfoDialogService } from '../../../services/info-dialog';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { TooltipModule } from 'primeng/tooltip';
-
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-sidebar',
@@ -28,9 +29,10 @@ import { TooltipModule } from 'primeng/tooltip';
     ToggleSwitchModule,
     FormsModule,
     DynamicDialogModule,
-    TooltipModule
+    TooltipModule,
+    ConfirmDialogModule
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss'
 })
@@ -43,12 +45,14 @@ export class SidebarComponent implements OnInit {
   loginTime: string = '';
   isDarkMode = false;
   isAnimating = false;
+  isAnalyticsPage = false;
 
   constructor(
     private router: Router,
     private messageService: MessageService,
     private themeService: ThemeService,
-    private infoDialogService: InfoDialogService
+    private infoDialogService: InfoDialogService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
@@ -67,6 +71,26 @@ export class SidebarComponent implements OnInit {
       this.currentTime = new Date();
     }, 1000);
 
+    this.checkIfAnalyticsPage(this.router.url);
+    this.buildMenu();
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.checkIfAnalyticsPage(event.urlAfterRedirects);
+    });
+  }
+
+  private checkIfAnalyticsPage(url: string): void {
+    const wasAnalytics = this.isAnalyticsPage;
+    this.isAnalyticsPage = url.includes('/analytics');
+
+    if (wasAnalytics !== this.isAnalyticsPage) {
+      this.buildMenu();
+    }
+  }
+
+  private buildMenu(): void {
     this.items = [
       {
         label: 'Info About Author',
@@ -117,6 +141,18 @@ export class SidebarComponent implements OnInit {
         command: () => this.onMenuClick()
       }
     ];
+
+    if (this.isAnalyticsPage) {
+      this.items.push(
+        { separator: true },
+        {
+          label: 'Logout',
+          icon: 'pi pi-sign-out',
+          styleClass: 'logout-menu-item',
+          command: () => this.confirmLogout()
+        }
+      );
+    }
   }
 
   onMenuClick(): void {
@@ -129,5 +165,26 @@ export class SidebarComponent implements OnInit {
     setTimeout(() => {
       this.isAnimating = false;
     }, 500);
+  }
+
+  confirmLogout(): void {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to logout?',
+      header: 'Confirm Logout',
+      icon: 'pi pi-sign-out',
+      acceptLabel: 'Yes, logout',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.logout();
+      }
+    });
+  }
+
+  logout(): void {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('username');
+    localStorage.removeItem('loginTime');
+    this.router.navigate(['/login']);
   }
 }

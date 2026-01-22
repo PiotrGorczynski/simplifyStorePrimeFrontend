@@ -84,8 +84,13 @@ html {
   color: #e8e8e8;
 
   .sidebar-container {
-    background: linear-gradient(180deg, #252526 0%, #1e1e1e 100%);
-    border-right: 1px solid #3e3e42;
+    app-sidebar {
+      background: #1a1a1a !important;
+    }
+
+    .layout-sidebar {
+      border-right: none !important;
+    }
 
     .user-profile {
       background: #2d2d30 !important;
