@@ -1,10 +1,11 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { ThemeService } from '../../../services/theme.service';
 import { ActionService } from '../../../services/action.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-layout',
@@ -18,14 +19,18 @@ export class MainLayoutComponent implements OnInit {
   actionPanelVisible = false;
   isDarkMode = false;
   isMobile = false;
+  private isActionPanelDisabled = false;
 
   private touchStartX = 0;
   private touchStartY = 0;
   private minSwipeDistance = 50;
 
+  private actionPanelDisabledRoutes = ['/analytics'];
+
   constructor(
     private themeService: ThemeService,
-    private actionService: ActionService
+    private actionService: ActionService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -33,6 +38,21 @@ export class MainLayoutComponent implements OnInit {
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
+
+    this.checkRouteForActionPanel(this.router.url);
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.checkRouteForActionPanel(event.urlAfterRedirects);
+    });
+  }
+
+  private checkRouteForActionPanel(url: string): void {
+    this.isActionPanelDisabled = this.actionPanelDisabledRoutes.some(route => url.startsWith(route));
+    if (this.isActionPanelDisabled) {
+      this.actionPanelVisible = false;
+    }
   }
 
   @HostListener('window:resize')
@@ -65,7 +85,7 @@ export class MainLayoutComponent implements OnInit {
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > this.minSwipeDistance) {
       if (deltaX > 0) {
         this.openSidebar();
-      } else {
+      } else if (!this.isActionPanelDisabled) {
         this.openActionPanel();
       }
     }
@@ -90,6 +110,7 @@ export class MainLayoutComponent implements OnInit {
   }
 
   toggleActionPanel(): void {
+    if (this.isActionPanelDisabled) return;
     this.actionPanelVisible = !this.actionPanelVisible;
     if (this.actionPanelVisible) {
       this.sidebarVisible = false;
@@ -97,6 +118,7 @@ export class MainLayoutComponent implements OnInit {
   }
 
   openActionPanel(): void {
+    if (this.isActionPanelDisabled) return;
     this.actionPanelVisible = true;
     this.sidebarVisible = false;
   }
