@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -59,6 +59,8 @@ interface Customer {
   styleUrl: './dashboard.scss'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
+
   products: Customer[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
@@ -66,6 +68,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedCustomer: Customer | null = null;
   isDarkMode = false;
   submitted: boolean = false;
+  searchValue: string = '';
 
   private actionSubscription: Subscription | null = null;
 
@@ -407,6 +410,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  onGlobalFilter(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.dt.filterGlobal(value, 'contains');
+  }
+
+  clearSearch(): void {
+    this.searchValue = '';
+    this.dt.filterGlobal('', 'contains');
+  }
+
   getLogoPath(): string {
     return this.isDarkMode ? 'logo-dark.png' : 'logo.png';
   }
@@ -559,7 +572,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.newProduct.salesOrder &&
       this.newProduct.category &&
       this.isEmailValid()
-  );
+    );
   }
 
   isEmailValid(): boolean {
@@ -618,7 +631,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   exportToPDF() {
-    this.exportService.exportToPDF(this.products, 'transactions', 'Transaction List');
+    this.exportService.exportToPDF(this.products, 'customers', 'Customer List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',

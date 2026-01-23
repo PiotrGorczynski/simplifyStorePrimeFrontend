@@ -1,5 +1,5 @@
 <div class="flex min-h-screen overflow-hidden" [@fadeInOut]>
-  <p-toast></p-toast>
+  <p-toast position="top-center"></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
   <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
@@ -7,19 +7,47 @@
 
       <div class="col-12 lg:col-10 p-2 table-column">
         <p-card styleClass="shadow-2 border-round-xl m-0 h-full">
-          <p-table [value]="products" [rows]="20" [paginator]="true" styleClass="p-datatable-sm p-datatable-striped" [rowHover]="true" [(selection)]="selectedCustomer" selectionMode="single" dataKey="id">
+          <div class="table-header mb-3">
+            <div class="search-wrapper">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="searchValue"
+                (input)="onGlobalFilter($event)"
+                placeholder="Search customers..."
+                class="search-input" />
+              <i
+                *ngIf="searchValue"
+                class="pi pi-times clear-icon"
+                (click)="clearSearch()">
+              </i>
+            </div>
+          </div>
+
+          <p-table
+            #dt
+            [value]="products"
+            [rows]="18"
+            [paginator]="true"
+            [globalFilterFields]="['info', 'salesOrder', 'invoices', 'paymentHistory', 'communication', 'category', 'feedback', 'notes', 'supportRequests']"
+            styleClass="p-datatable-sm p-datatable-striped"
+            [rowHover]="true"
+            [(selection)]="selectedCustomer"
+            selectionMode="single"
+            dataKey="id">
             <ng-template pTemplate="header">
               <tr>
-                <th class="text-xs">ID</th>
-                <th class="text-xs">INFO</th>
-                <th class="text-xs">SALES ORDER</th>
-                <th class="text-xs">INVOICE</th>
-                <th class="text-xs">PAYMENT HISTORY</th>
-                <th class="text-xs">COMMUNICATION</th>
-                <th class="text-xs">CATEGORY</th>
-                <th class="text-xs">FEEDBACK</th>
-                <th class="text-xs">NOTES</th>
-                <th class="text-xs">SUPPORT</th>
+                <th class="text-xs" pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="info">INFO <p-sortIcon field="info"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="salesOrder">SALES ORDER <p-sortIcon field="salesOrder"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="invoices">INVOICE <p-sortIcon field="invoices"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="paymentHistory">PAYMENT HISTORY <p-sortIcon field="paymentHistory"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="communication">COMMUNICATION <p-sortIcon field="communication"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="category">CATEGORY <p-sortIcon field="category"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="feedback">FEEDBACK <p-sortIcon field="feedback"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="notes">NOTES <p-sortIcon field="notes"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="supportRequests">SUPPORT <p-sortIcon field="supportRequests"></p-sortIcon></th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-product>
@@ -43,9 +71,24 @@
                     <div class="empty-state-icon">
                       <i class="pi pi-users"></i>
                     </div>
-                    <h3 class="empty-state-title">No customers yet</h3>
-                    <p class="empty-state-message">Start by adding your first customer to the system.</p>
-                    <p-button label="Add First Customer" icon="pi pi-plus" severity="success" (onClick)="showDialog()"></p-button>
+                    <h3 class="empty-state-title">{{ searchValue ? 'No customers found' : 'No customers yet' }}</h3>
+                    <p class="empty-state-message">
+                      {{ searchValue ? 'Try adjusting your search criteria.' : 'Start by adding your first customer to the system.' }}
+                    </p>
+                    <p-button
+                      *ngIf="!searchValue"
+                      label="Add First Customer"
+                      icon="pi pi-plus"
+                      severity="success"
+                      (onClick)="showDialog()">
+                    </p-button>
+                    <p-button
+                      *ngIf="searchValue"
+                      label="Clear Search"
+                      icon="pi pi-times"
+                      severity="secondary"
+                      (onClick)="clearSearch()">
+                    </p-button>
                   </div>
                 </td>
               </tr>

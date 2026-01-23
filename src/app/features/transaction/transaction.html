@@ -1,5 +1,5 @@
 <div class="flex min-h-screen overflow-hidden" [@fadeInOut]>
-  <p-toast></p-toast>
+  <p-toast position="top-center"></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
   <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
@@ -17,7 +17,7 @@
             selectionMode="single"
             dataKey="id">
 
-            <ng-template #header>
+            <ng-template pTemplate="header">
               <tr>
                 <th style="width: 3rem"></th>
                 <th class="text-xs">ID</th>
@@ -32,7 +32,7 @@
               </tr>
             </ng-template>
 
-            <ng-template #body let-transaction>
+            <ng-template pTemplate="body" let-transaction>
               <tr class="text-xs" [pSelectableRow]="transaction">
                 <td>
                   <button
@@ -70,7 +70,7 @@
                         Transaction Items ({{transaction.items.length}})
                       </h5>
                       <p-table [value]="transaction.items" class="p-datatable-sm">
-                        <ng-template #header>
+                        <ng-template pTemplate="header">
                           <tr>
                             <th>Product Code</th>
                             <th>Product Name</th>
@@ -79,7 +79,7 @@
                             <th>Subtotal</th>
                           </tr>
                         </ng-template>
-                        <ng-template #body let-item>
+                        <ng-template pTemplate="body" let-item>
                           <tr>
                             <td class="font-semibold">{{item.productCode}}</td>
                             <td>{{item.productName}}</td>
@@ -88,7 +88,7 @@
                             <td class="font-bold text-green-600">${{(item.quantity * item.pricePerUnit).toFixed(2)}}</td>
                           </tr>
                         </ng-template>
-                        <ng-template #footer>
+                        <ng-template pTemplate="footer">
                           <tr>
                             <td colspan="4" class="text-right font-bold">TOTAL:</td>
                             <td class="font-bold text-green-600 text-xl">${{transaction.total.toFixed(2)}}</td>
@@ -101,7 +101,7 @@
               }
             </ng-template>
 
-            <ng-template>
+            <ng-template pTemplate="emptymessage">
               <tr>
                 <td colspan="10">
                   <div class="empty-state">
@@ -177,7 +177,7 @@
   </div>
 
   <p-dialog [header]="getDialogHeader()" [(visible)]="displayDialog" [modal]="true" [style]="{width: '900px'}" class="custom-dialog">
-    <ng-template #content>
+    <ng-template pTemplate="content">
       <div class="dialog-form-container">
         <div class="grid">
           <div class="col-6">
@@ -332,7 +332,7 @@
 
           @if (newTransaction.items && newTransaction.items.length > 0) {
             <p-table [value]="newTransaction.items" class="p-datatable-sm">
-              <ng-template #header>
+              <ng-template pTemplate="header">
                 <tr>
                   <th>Product Code</th>
                   <th>Product Name</th>
@@ -342,7 +342,7 @@
                   <th style="width: 4rem">Actions</th>
                 </tr>
               </ng-template>
-              <ng-template #body let-item let-rowIndex="rowIndex">
+              <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
                 <tr>
                   <td class="font-semibold">{{item.productCode}}</td>
                   <td>{{item.productName}}</td>
@@ -361,7 +361,7 @@
                   </td>
                 </tr>
               </ng-template>
-              <ng-template #footer>
+              <ng-template pTemplate="footer">
                 <tr>
                   <td colspan="4" class="text-right font-bold">TOTAL:</td>
                   <td class="font-bold text-green-600 text-xl" colspan="2">${{newTransaction.total?.toFixed(2) || '0.00'}}</td>
@@ -381,7 +381,7 @@
         </div>
       </div>
     </ng-template>
-    <ng-template #footer>
+    <ng-template pTemplate="footer">
       <div class="flex justify-content-end gap-2">
         <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
         <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveTransaction()"></p-button>

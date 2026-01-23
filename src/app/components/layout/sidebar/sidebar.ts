@@ -8,8 +8,6 @@ import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../../services/theme.service';
 import { InfoDialogService } from '../../../services/info-dialog';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
@@ -26,8 +24,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     AvatarModule,
     CardModule,
     ToastModule,
-    ToggleSwitchModule,
-    FormsModule,
     DynamicDialogModule,
     TooltipModule,
     ConfirmDialogModule

@@ -6,6 +6,45 @@
   min-height: 100vh;
 }
 
+.table-header {
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-color-secondary);
+      z-index: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      padding-left: 2.5rem !important;
+      padding-right: 2.5rem !important;
+      border-radius: 8px;
+    }
+
+    .clear-icon {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-color-secondary);
+      transition: color 0.2s;
+      z-index: 1;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+  }
+}
+
 @media (max-width: 991px) {
   .dashboard-container {
     padding-right: 0.5rem !important;
@@ -20,9 +59,37 @@
     max-width: 100% !important;
     width: 100% !important;
   }
+
+  .table-header .search-wrapper {
+    max-width: 100%;
+  }
 }
 
 ::ng-deep {
+  .p-datatable .p-sortable-column {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: var(--surface-hover) !important;
+    }
+
+    .p-sortable-column-icon {
+      color: var(--text-color-secondary);
+      margin-left: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    &.p-highlight {
+      background: rgba(124, 77, 255, 0.1) !important;
+
+      .p-sortable-column-icon {
+        color: #7c4dff;
+      }
+    }
+  }
+
   .p-datatable-wrapper {
     overflow-y: visible !important;
     max-height: none !important;
@@ -111,6 +178,7 @@
           height: 2.8rem !important;
           color: #64748b !important;
         }
+
         .logout-btn {
           color: #ef4444 !important;
         }
@@ -123,6 +191,7 @@
       background: #7c4dff !important;
       color: white !important;
     }
+
     .p-dialog-content {
       background-color: #f0f0ff !important;
       padding: 1.5rem !important;
@@ -205,6 +274,41 @@
   }
 
   .my-app-dark {
+    .table-header .search-wrapper {
+      .search-input {
+        background: #2d2d30;
+        color: #e8e8e8;
+        border-color: #3e3e42;
+
+        &:focus {
+          border-color: #7c4dff;
+          box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.25);
+        }
+
+        &::placeholder {
+          color: #858585;
+        }
+      }
+
+      .search-icon, .clear-icon {
+        color: #858585;
+      }
+
+      .clear-icon:hover {
+        color: #7c4dff;
+      }
+    }
+
+    .p-datatable .p-sortable-column {
+      &:hover {
+        background: #37373d !important;
+      }
+
+      &.p-highlight {
+        background: rgba(124, 77, 255, 0.2) !important;
+      }
+    }
+
     .custom-dialog {
       .p-dialog-header {
         background: #7c4dff !important;

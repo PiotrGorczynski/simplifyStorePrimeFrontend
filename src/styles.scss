@@ -649,3 +649,96 @@ html {
 .p-select.ng-invalid.ng-dirty {
   border-color: #ef4444;
 }
+
+.p-dialog {
+  max-width: 95vw !important;
+  max-height: 90vh !important;
+
+  @media (max-width: 768px) {
+    width: 95vw !important;
+    margin: 0.5rem !important;
+
+    .p-dialog-content {
+      padding: 1rem !important;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .field-row {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 0.5rem !important;
+
+      .field-label {
+        width: 100% !important;
+      }
+
+      .field-input {
+        width: 100% !important;
+      }
+    }
+
+    .grid > .col-6 {
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+    }
+  }
+}
+
+.my-app-dark {
+  .p-dialog-mask {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .p-dialog {
+    z-index: 1100 !important;
+
+    .p-dialog-header {
+      background: #7c4dff !important;
+      color: white !important;
+
+      .p-dialog-header-close {
+        color: white !important;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+        }
+      }
+    }
+
+    .p-dialog-content {
+      background: #252526 !important;
+      color: #e8e8e8 !important;
+      pointer-events: auto !important;
+
+      input, textarea, .p-select, .p-datepicker, .p-inputnumber {
+        pointer-events: auto !important;
+      }
+    }
+
+    .p-dialog-footer {
+      background: #252526 !important;
+      border-top: 1px solid #3e3e42 !important;
+    }
+  }
+
+  .p-component-overlay {
+    pointer-events: auto !important;
+  }
+
+  .p-select-overlay,
+  .p-datepicker-panel {
+    z-index: 1200 !important;
+    background: #252526 !important;
+    border: 1px solid #3e3e42 !important;
+
+    .p-select-option,
+    .p-datepicker-calendar td span {
+      color: #e8e8e8 !important;
+
+      &:hover {
+        background: #37373d !important;
+      }
+    }
+  }
+}

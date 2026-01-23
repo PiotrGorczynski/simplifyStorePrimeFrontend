@@ -29,19 +29,6 @@
     <div class="clock-section p-2 font-bold surface-overlay border-round shadow-1 mb-2">
       <i class="pi pi-clock mr-2"></i> {{ currentTime | date: 'HH:mm:ss' }}
     </div>
-
-    <div class="theme-toggle p-2 surface-overlay border-round shadow-1 mb-2">
-      <div class="flex align-items-center justify-content-between">
-        <span class="font-semibold">
-          <i class="pi" [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'" class="mr-2"></i>
-          {{ isDarkMode ? 'Light' : 'Dark' }}
-        </span>
-        <p-toggleSwitch
-          [(ngModel)]="isDarkMode"
-          (onChange)="toggleDarkMode()">
-        </p-toggleSwitch>
-      </div>
-    </div>
     <div class="date-mini p-2 font-bold surface-overlay border-round shadow-1 mb-3">
       <i class="pi pi-calendar mr-2"></i> {{ currentTime | date: 'dd-MM-yyyy' }}
     </div>

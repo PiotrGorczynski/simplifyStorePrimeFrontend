@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -20,6 +20,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ExportService } from '../../services/export.service';
 import { fadeInOut } from '../../../animations';
 import { ThemeService } from '../../services/theme.service';
+import {ActionType, ActionService} from '../../services/action.service';
+import { Subscription } from 'rxjs';
 
 interface TransactionItemModel {
   productId: number;
@@ -69,7 +71,7 @@ interface TransactionModel {
   templateUrl: './transaction.html',
   styleUrl: './transaction.scss'
 })
-export class TransactionComponent implements OnInit {
+export class TransactionComponent implements OnInit, OnDestroy {
   transactions: TransactionModel[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
@@ -77,6 +79,7 @@ export class TransactionComponent implements OnInit {
   selectedTransaction: TransactionModel | null = null;
   isDarkMode = false;
   submitted: boolean = false;
+  private actionSubscription: Subscription | null = null;
 
   expandedRowIds: Set<number> = new Set();
 
@@ -148,7 +151,8 @@ export class TransactionComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private exportService: ExportService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private actionService: ActionService
   ) {}
 
   ngOnInit() {
@@ -310,6 +314,51 @@ export class TransactionComponent implements OnInit {
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
+
+    this.actionSubscription = this.actionService.action$.subscribe((action: ActionType) => {
+      this.handleAction(action);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.actionSubscription) {
+      this.actionSubscription.unsubscribe();
+    }
+  }
+
+  private handleAction(action: ActionType): void {
+    switch (action) {
+      case 'show':
+        this.onShowTransaction();
+        break;
+      case 'insert':
+        this.showDialog();
+        break;
+      case 'update':
+        this.showUpdateDialog();
+        break;
+      case 'delete':
+        this.deleteTransaction();
+        break;
+      case 'exportPdf':
+        this.exportToPDF();
+        break;
+      case 'exportExcel':
+        this.exportToExcel();
+        break;
+      case 'grid':
+        this.exportToCSV();
+        break;
+      case 'code':
+        this.exportToHTML();
+        break;
+      case 'database':
+        this.exportToJSON();
+        break;
+      case 'logout':
+        this.onLogout();
+        break;
+    }
   }
 
   getLogoPath(): string {
