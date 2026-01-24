@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -52,6 +52,7 @@ interface DeliveryModel {
   styleUrl: './delivery.scss'
 })
 export class DeliveryComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
   deliveries: DeliveryModel[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
@@ -59,6 +60,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   selectedDelivery: DeliveryModel | null = null;
   isDarkMode = false;
   submitted: boolean = false;
+  searchValue: string = '';
 
   private actionSubscription: Subscription | null = null;
 
@@ -178,6 +180,16 @@ export class DeliveryComponent implements OnInit, OnDestroy {
         this.onLogout();
         break;
     }
+  }
+
+  onGlobalFilter(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.dt.filterGlobal(value, 'contains');
+  }
+
+  clearSearch(): void {
+    this.searchValue = '';
+    this.dt.filterGlobal('', 'contains');
   }
 
   getLogoPath(): string {
@@ -391,7 +403,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   }
 
   exportToPDF() {
-    this.exportService.exportToPDF(this.deliveries, 'transactions', 'Transaction List');
+    this.exportService.exportToPDF(this.deliveries, 'deliveries', 'Delivery List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',

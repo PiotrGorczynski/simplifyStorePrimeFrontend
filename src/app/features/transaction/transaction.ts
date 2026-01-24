@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -20,7 +20,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ExportService } from '../../services/export.service';
 import { fadeInOut } from '../../../animations';
 import { ThemeService } from '../../services/theme.service';
-import {ActionType, ActionService} from '../../services/action.service';
+import { ActionType, ActionService } from '../../services/action.service';
 import { Subscription } from 'rxjs';
 
 interface TransactionItemModel {
@@ -72,6 +72,7 @@ interface TransactionModel {
   styleUrl: './transaction.scss'
 })
 export class TransactionComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') dt!: Table;
   transactions: TransactionModel[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
@@ -79,6 +80,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   selectedTransaction: TransactionModel | null = null;
   isDarkMode = false;
   submitted: boolean = false;
+  searchValue: string = '';
   private actionSubscription: Subscription | null = null;
 
   expandedRowIds: Set<number> = new Set();
@@ -359,6 +361,16 @@ export class TransactionComponent implements OnInit, OnDestroy {
         this.onLogout();
         break;
     }
+  }
+
+  onGlobalFilter(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.dt.filterGlobal(value, 'contains');
+  }
+
+  clearSearch(): void {
+    this.searchValue = '';
+    this.dt.filterGlobal('', 'contains');
   }
 
   getLogoPath(): string {
@@ -643,7 +655,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   }
 
   exportToExcel() {
-    this.exportService.exportToExcel(this.transactions, 'customers');
+    this.exportService.exportToExcel(this.transactions, 'transactions');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -653,7 +665,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   }
 
   exportToCSV() {
-    this.exportService.exportToCSV(this.transactions, 'customers');
+    this.exportService.exportToCSV(this.transactions, 'transactions');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -663,7 +675,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   }
 
   exportToJSON() {
-    this.exportService.exportToJSON(this.transactions, 'customers');
+    this.exportService.exportToJSON(this.transactions, 'transactions');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -673,7 +685,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   }
 
   exportToHTML() {
-    this.exportService.exportToHTML(this.transactions, 'customers', 'Customer List');
+    this.exportService.exportToHTML(this.transactions, 'transactions', 'Transaction List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',

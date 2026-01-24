@@ -7,10 +7,30 @@
 
       <div class="col-12 lg:col-10 p-2 table-column">
         <p-card styleClass="shadow-2 border-round-xl m-0 h-full">
+          <div class="table-header mb-3">
+            <div class="search-wrapper">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="searchValue"
+                (input)="onGlobalFilter($event)"
+                placeholder="Search deliveries..."
+                class="search-input" />
+              <i
+                *ngIf="searchValue"
+                class="pi pi-times clear-icon"
+                (click)="clearSearch()">
+              </i>
+            </div>
+          </div>
+
           <p-table
+            #dt
             [value]="deliveries"
             [rows]="20"
             [paginator]="true"
+            [globalFilterFields]="['deliveryType', 'status', 'provider', 'transactionId']"
             styleClass="p-datatable-sm p-datatable-striped"
             [rowHover]="true"
             [(selection)]="selectedDelivery"
@@ -19,11 +39,11 @@
 
             <ng-template pTemplate="header">
               <tr>
-                <th class="text-xs">ID</th>
-                <th class="text-xs">TRANSACTION ID</th>
-                <th class="text-xs">DELIVERY TYPE</th>
-                <th class="text-xs">STATUS</th>
-                <th class="text-xs">PROVIDER</th>
+                <th class="text-xs" pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="transactionId">TRANSACTION ID <p-sortIcon field="transactionId"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="deliveryType">DELIVERY TYPE <p-sortIcon field="deliveryType"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="status">STATUS <p-sortIcon field="status"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="provider">PROVIDER <p-sortIcon field="provider"></p-sortIcon></th>
               </tr>
             </ng-template>
 
@@ -48,9 +68,24 @@
                     <div class="empty-state-icon">
                       <i class="pi pi-truck"></i>
                     </div>
-                    <h3 class="empty-state-title">No deliveries yet</h3>
-                    <p class="empty-state-message">Start by adding your first delivery to the system.</p>
-                    <p-button label="Add First Delivery" icon="pi pi-plus" severity="success" (onClick)="showDialog()"></p-button>
+                    <h3 class="empty-state-title">{{ searchValue ? 'No deliveries found' : 'No deliveries yet' }}</h3>
+                    <p class="empty-state-message">
+                      {{ searchValue ? 'Try adjusting your search criteria.' : 'Start by adding your first delivery to the system.' }}
+                    </p>
+                    <p-button
+                      *ngIf="!searchValue"
+                      label="Add First Delivery"
+                      icon="pi pi-plus"
+                      severity="success"
+                      (onClick)="showDialog()">
+                    </p-button>
+                    <p-button
+                      *ngIf="searchValue"
+                      label="Clear Search"
+                      icon="pi pi-times"
+                      severity="secondary"
+                      (onClick)="clearSearch()">
+                    </p-button>
                   </div>
                 </td>
               </tr>
