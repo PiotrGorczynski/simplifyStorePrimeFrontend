@@ -14,25 +14,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ExportService } from '../../services/export.service';
 import { fadeInOut } from '../../../animations';
 import { ThemeService } from '../../services/theme.service';
 import { ActionService, ActionType } from '../../services/action.service';
-
-interface Customer {
-  id: number;
-  info: string;
-  salesOrder: string;
-  invoices: string;
-  paymentHistory: string;
-  communication: string;
-  category: string;
-  feedback: string;
-  notes: string;
-  supportRequests: string;
-}
+import { CustomerService, Customer } from '../../services/customer.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -51,7 +41,8 @@ interface Customer {
     InputNumberModule,
     SelectModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    ProgressSpinnerModule
   ],
   providers: [ConfirmationService, MessageService],
   animations: [fadeInOut],
@@ -61,7 +52,7 @@ interface Customer {
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
 
-  products: Customer[] = [];
+  customers: Customer[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
   selectedCustomerId: number | null = null;
@@ -69,19 +60,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isDarkMode = false;
   submitted: boolean = false;
   searchValue: string = '';
+  isLoading = false;
 
   private actionSubscription: Subscription | null = null;
+  private loadingSubscription: Subscription | null = null;
 
-  newProduct: Partial<Customer> = {
+  newCustomer: Partial<Customer> = {
     info: '',
-    salesOrder: '',
+    salesOrders: '',
     invoices: 'no',
     paymentHistory: 'no',
     communication: '',
     category: '',
     feedback: '',
     notes: '',
-    supportRequests: 'None'
+    supportRequest: 'None'
   };
 
   yesNoOptions = [
@@ -112,252 +105,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private exportService: ExportService,
     private themeService: ThemeService,
-    private actionService: ActionService
+    private actionService: ActionService,
+    private customerService: CustomerService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.products = [
-      {
-        id: 1,
-        info: 'Customer Alpha',
-        salesOrder: 'service',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'alpha@example.com',
-        category: 'retail chains',
-        feedback: 'Great service',
-        notes: 'Standard customer',
-        supportRequests: 'None'
-      },
-      {
-        id: 2,
-        info: 'Customer Beta',
-        salesOrder: 'bulk',
-        invoices: 'no',
-        paymentHistory: 'no',
-        communication: 'beta@example.com',
-        category: 'individual',
-        feedback: 'Wait for reply',
-        notes: 'Requires follow-up',
-        supportRequests: '1 pending'
-      },
-      {
-        id: 3,
-        info: 'Customer Gamma',
-        salesOrder: 'order',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'gamma@example.com',
-        category: 'business',
-        feedback: 'Excellent',
-        notes: 'Premium client',
-        supportRequests: 'None'
-      },
-      {
-        id: 4,
-        info: 'Customer Delta',
-        salesOrder: 'subscription',
-        invoices: 'yes',
-        paymentHistory: 'no',
-        communication: 'delta@example.com',
-        category: 'wholesalers',
-        feedback: 'Good',
-        notes: 'Monthly subscription',
-        supportRequests: 'None'
-      },
-      {
-        id: 5,
-        info: 'Customer Epsilon',
-        salesOrder: 'periodic',
-        invoices: 'no',
-        paymentHistory: 'yes',
-        communication: 'epsilon@example.com',
-        category: 'detail',
-        feedback: 'Satisfactory',
-        notes: 'Seasonal orders',
-        supportRequests: '2 pending'
-      },
-      {
-        id: 6,
-        info: 'Customer Zeta',
-        salesOrder: 'B2B',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'zeta@example.com',
-        category: 'retail chains',
-        feedback: 'Outstanding',
-        notes: 'Corporate account',
-        supportRequests: 'None'
-      },
-      {
-        id: 7,
-        info: 'Customer Eta',
-        salesOrder: 'service',
-        invoices: 'no',
-        paymentHistory: 'no',
-        communication: 'eta@example.com',
-        category: 'individual',
-        feedback: 'Needs improvement',
-        notes: 'First time buyer',
-        supportRequests: '1 pending'
-      },
-      {
-        id: 8,
-        info: 'Customer Theta',
-        salesOrder: 'bulk',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'theta@example.com',
-        category: 'wholesalers',
-        feedback: 'Very good',
-        notes: 'Bulk orders only',
-        supportRequests: 'None'
-      },
-      {
-        id: 9,
-        info: 'Customer Iota',
-        salesOrder: 'order',
-        invoices: 'yes',
-        paymentHistory: 'no',
-        communication: 'iota@example.com',
-        category: 'business',
-        feedback: 'Satisfied',
-        notes: 'Regular customer',
-        supportRequests: 'None'
-      },
-      {
-        id: 10,
-        info: 'Customer Kappa',
-        salesOrder: 'subscription',
-        invoices: 'no',
-        paymentHistory: 'yes',
-        communication: 'kappa@example.com',
-        category: 'retail chains',
-        feedback: 'Good experience',
-        notes: 'Annual subscription',
-        supportRequests: '3 pending'
-      },
-      {
-        id: 11,
-        info: 'Customer Lambda',
-        salesOrder: 'service',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'lambda@example.com',
-        category: 'business',
-        feedback: 'Exceptional service',
-        notes: 'VIP customer',
-        supportRequests: 'None'
-      },
-      {
-        id: 12,
-        info: 'Customer Mu',
-        salesOrder: 'bulk',
-        invoices: 'no',
-        paymentHistory: 'yes',
-        communication: 'mu@example.com',
-        category: 'wholesalers',
-        feedback: 'Reliable partner',
-        notes: 'Large volume orders',
-        supportRequests: 'None'
-      },
-      {
-        id: 13,
-        info: 'Customer Nu',
-        salesOrder: 'order',
-        invoices: 'yes',
-        paymentHistory: 'no',
-        communication: 'nu@example.com',
-        category: 'individual',
-        feedback: 'Happy customer',
-        notes: 'Occasional buyer',
-        supportRequests: '1 pending'
-      },
-      {
-        id: 14,
-        info: 'Customer Xi',
-        salesOrder: 'periodic',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'xi@example.com',
-        category: 'retail chains',
-        feedback: 'Professional',
-        notes: 'Quarterly orders',
-        supportRequests: 'None'
-      },
-      {
-        id: 15,
-        info: 'Customer Omicron',
-        salesOrder: 'B2B',
-        invoices: 'no',
-        paymentHistory: 'no',
-        communication: 'omicron@example.com',
-        category: 'detail',
-        feedback: 'Under evaluation',
-        notes: 'New business partner',
-        supportRequests: '2 pending'
-      },
-      {
-        id: 16,
-        info: 'Customer Pi',
-        salesOrder: 'subscription',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'pi@example.com',
-        category: 'business',
-        feedback: 'Loyal customer',
-        notes: 'Long-term contract',
-        supportRequests: 'None'
-      },
-      {
-        id: 17,
-        info: 'Customer Rho',
-        salesOrder: 'service',
-        invoices: 'no',
-        paymentHistory: 'yes',
-        communication: 'rho@example.com',
-        category: 'individual',
-        feedback: 'Positive feedback',
-        notes: 'Repeat customer',
-        supportRequests: 'None'
-      },
-      {
-        id: 18,
-        info: 'Customer Sigma',
-        salesOrder: 'bulk',
-        invoices: 'yes',
-        paymentHistory: 'no',
-        communication: 'sigma@example.com',
-        category: 'wholesalers',
-        feedback: 'Excellent communication',
-        notes: 'Distributor',
-        supportRequests: '1 pending'
-      },
-      {
-        id: 19,
-        info: 'Customer Tau',
-        salesOrder: 'order',
-        invoices: 'yes',
-        paymentHistory: 'yes',
-        communication: 'tau@example.com',
-        category: 'retail chains',
-        feedback: 'Very satisfied',
-        notes: 'Multi-location client',
-        supportRequests: 'None'
-      },
-      {
-        id: 20,
-        info: 'Customer Upsilon',
-        salesOrder: 'periodic',
-        invoices: 'no',
-        paymentHistory: 'yes',
-        communication: 'upsilon@example.com',
-        category: 'business',
-        feedback: 'Good partnership',
-        notes: 'Strategic account',
-        supportRequests: '4 pending'
-      }
-    ];
+    this.loadingSubscription = this.customerService.loading$.subscribe(
+      loading => this.isLoading = loading
+    );
+
+    this.loadCustomers();
 
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
@@ -372,10 +130,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.actionSubscription) {
       this.actionSubscription.unsubscribe();
     }
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
+  }
+
+  loadCustomers(): void {
+    this.customerService.getAll().subscribe({
+      next: (data) => {
+        this.customers = data;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.message || 'Failed to load customers',
+          life: 5000
+        });
+        this.customers = [];
+      }
+    });
   }
 
   private handleAction(action: ActionType): void {
-    console.log('Received action:', action);
     switch (action) {
       case 'show':
         this.onShowCustomer();
@@ -387,16 +164,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.showUpdateDialog();
         break;
       case 'delete':
-        this.deleteProduct();
+        this.deleteCustomer();
         break;
       case 'exportPdf':
-        this.exportToExcel();
+        this.exportToPDF();
         break;
       case 'exportExcel':
         this.exportToExcel();
         break;
       case 'grid':
-        this.exportToPDF();
+        this.exportToCSV();
         break;
       case 'code':
         this.exportToHTML();
@@ -428,16 +205,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isEditMode = false;
     this.selectedCustomerId = null;
     this.submitted = false;
-    this.newProduct = {
+    this.newCustomer = {
       info: '',
-      salesOrder: '',
+      salesOrders: '',
       invoices: 'no',
       paymentHistory: 'no',
       communication: '',
       category: '',
       feedback: '',
       notes: '',
-      supportRequests: 'None'
+      supportRequest: 'None'
     };
     this.displayDialog = true;
   }
@@ -456,21 +233,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isEditMode = true;
     this.submitted = false;
     this.selectedCustomerId = this.selectedCustomer.id;
-    this.newProduct = {
+    this.newCustomer = {
       info: this.selectedCustomer.info,
-      salesOrder: this.selectedCustomer.salesOrder,
+      salesOrders: this.selectedCustomer.salesOrders,
       invoices: this.selectedCustomer.invoices,
       paymentHistory: this.selectedCustomer.paymentHistory,
       communication: this.selectedCustomer.communication,
       category: this.selectedCustomer.category,
       feedback: this.selectedCustomer.feedback,
       notes: this.selectedCustomer.notes,
-      supportRequests: this.selectedCustomer.supportRequests
+      supportRequest: this.selectedCustomer.supportRequest
     };
     this.displayDialog = true;
   }
 
-  saveProduct() {
+  saveCustomer() {
     this.submitted = true;
     if (!this.isFormValid()) {
       this.messageService.add({
@@ -483,36 +260,57 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     if (this.isEditMode && this.selectedCustomerId) {
-      const index = this.products.findIndex(p => p.id === this.selectedCustomerId);
-      if (index !== -1) {
-        this.products[index] = {
-          ...this.products[index],
-          ...this.newProduct
-        } as Customer;
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Customer updated successfully',
-          life: 3000
-        });
-      }
+      this.customerService.update(this.selectedCustomerId, this.newCustomer).subscribe({
+        next: (updatedCustomer) => {
+          const index = this.customers.findIndex(c => c.id === this.selectedCustomerId);
+          if (index !== -1) {
+            this.customers[index] = updatedCustomer;
+            this.customers = [...this.customers];
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Updated',
+            detail: 'Customer updated successfully',
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to update customer',
+            life: 5000
+          });
+        }
+      });
     } else {
-      const nextId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
-      this.products = [...this.products, { ...this.newProduct, id: nextId } as Customer];
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Created',
-        detail: `Customer ${this.newProduct.info} added successfully`,
-        life: 3000
+      this.customerService.create(this.newCustomer as Omit<Customer, 'id'>).subscribe({
+        next: (createdCustomer) => {
+          this.customers = [...this.customers, createdCustomer];
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Created',
+            detail: `Customer ${createdCustomer.info} added successfully`,
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to create customer',
+            life: 5000
+          });
+        }
       });
     }
-    this.submitted = false;
-    this.displayDialog = false;
   }
 
-  deleteProduct() {
+  deleteCustomer() {
     if (!this.selectedCustomer) {
       this.messageService.add({
         severity: 'warn',
@@ -529,14 +327,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.products = this.products.filter(p => p.id !== this.selectedCustomer!.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: 'Customer deleted successfully',
-          life: 3000
+        this.customerService.delete(this.selectedCustomer!.id).subscribe({
+          next: () => {
+            this.customers = this.customers.filter(c => c.id !== this.selectedCustomer!.id);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deleted',
+              detail: 'Customer deleted successfully',
+              life: 3000
+            });
+            this.selectedCustomer = null;
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: error.message || 'Failed to delete customer',
+              life: 5000
+            });
+          }
         });
-        this.selectedCustomer = null;
       }
     });
   }
@@ -567,25 +377,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   isFormValid(): boolean {
     return !!(
-      this.newProduct.info &&
-      this.newProduct.info.trim() !== '' &&
-      this.newProduct.salesOrder &&
-      this.newProduct.category &&
+      this.newCustomer.info &&
+      this.newCustomer.info.trim() !== '' &&
+      this.newCustomer.salesOrders &&
+      this.newCustomer.category &&
       this.isEmailValid()
     );
   }
 
   isEmailValid(): boolean {
-    if (!this.newProduct.communication || !this.newProduct.communication.trim()) {
+    if (!this.newCustomer.communication || !this.newCustomer.communication.trim()) {
       return false;
     }
     return this.isValidEmailFormat();
   }
 
   isValidEmailFormat(): boolean {
-    if (!this.newProduct.communication) return false;
+    if (!this.newCustomer.communication) return false;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(this.newProduct.communication);
+    return emailRegex.test(this.newCustomer.communication);
   }
 
   getDialogHeader(): string {
@@ -602,11 +412,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       header: 'Logout Confirmation',
       icon: 'pi pi-sign-out',
       accept: () => {
-        const username = localStorage.getItem('username') || 'User';
-
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('loginTime');
+        const username = this.authService.getUsername() || 'User';
 
         this.messageService.add({
           severity: 'info',
@@ -616,7 +422,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
 
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.authService.logout();
         }, 500);
       },
       reject: () => {
@@ -631,7 +437,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   exportToPDF() {
-    this.exportService.exportToPDF(this.products, 'customers', 'Customer List');
+    this.exportService.exportToPDF(this.customers, 'customers', 'Customer List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -641,7 +447,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   exportToExcel() {
-    this.exportService.exportToExcel(this.products, 'customers');
+    this.exportService.exportToExcel(this.customers, 'customers');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -651,7 +457,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   exportToCSV() {
-    this.exportService.exportToCSV(this.products, 'customers');
+    this.exportService.exportToCSV(this.customers, 'customers');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -661,7 +467,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   exportToJSON() {
-    this.exportService.exportToJSON(this.products, 'customers');
+    this.exportService.exportToJSON(this.customers, 'customers');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',
@@ -671,7 +477,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   exportToHTML() {
-    this.exportService.exportToHTML(this.products, 'customers', 'Customer List');
+    this.exportService.exportToHTML(this.customers, 'customers', 'Customer List');
     this.messageService.add({
       severity: 'success',
       summary: 'Exported',

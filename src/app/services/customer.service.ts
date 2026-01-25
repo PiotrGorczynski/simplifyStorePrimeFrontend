@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, finalize } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 
 export interface Customer {
   id: number;
   info: string;
-  salesOrder: string;
+  salesOrders: string;
   invoices: string;
   paymentHistory: string;
   communication: string;
   category: string;
   feedback: string;
   notes: string;
-  supportRequests: string;
+  supportRequest: string;
 }
 
 @Injectable({

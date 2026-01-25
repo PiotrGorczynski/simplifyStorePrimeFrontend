@@ -2,6 +2,10 @@
   <p-toast position="top-center"></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
+  <div *ngIf="isLoading" class="loading-overlay">
+    <p-progressSpinner strokeWidth="4" fill="transparent" animationDuration=".5s"></p-progressSpinner>
+  </div>
+
   <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
     <div class="grid align-items-stretch m-0 g-2">
 
@@ -27,10 +31,10 @@
 
           <p-table
             #dt
-            [value]="products"
+            [value]="customers"
             [rows]="18"
             [paginator]="true"
-            [globalFilterFields]="['info', 'salesOrder', 'invoices', 'paymentHistory', 'communication', 'category', 'feedback', 'notes', 'supportRequests']"
+            [globalFilterFields]="['info', 'salesOrders', 'invoices', 'paymentHistory', 'communication', 'category', 'feedback', 'notes', 'supportRequest']"
             styleClass="p-datatable-sm p-datatable-striped"
             [rowHover]="true"
             [(selection)]="selectedCustomer"
@@ -40,28 +44,28 @@
               <tr>
                 <th class="text-xs" pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
                 <th class="text-xs" pSortableColumn="info">INFO <p-sortIcon field="info"></p-sortIcon></th>
-                <th class="text-xs" pSortableColumn="salesOrder">SALES ORDER <p-sortIcon field="salesOrder"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="salesOrders">SALES ORDER <p-sortIcon field="salesOrders"></p-sortIcon></th>
                 <th class="text-xs" pSortableColumn="invoices">INVOICE <p-sortIcon field="invoices"></p-sortIcon></th>
                 <th class="text-xs" pSortableColumn="paymentHistory">PAYMENT HISTORY <p-sortIcon field="paymentHistory"></p-sortIcon></th>
                 <th class="text-xs" pSortableColumn="communication">COMMUNICATION <p-sortIcon field="communication"></p-sortIcon></th>
                 <th class="text-xs" pSortableColumn="category">CATEGORY <p-sortIcon field="category"></p-sortIcon></th>
                 <th class="text-xs" pSortableColumn="feedback">FEEDBACK <p-sortIcon field="feedback"></p-sortIcon></th>
                 <th class="text-xs" pSortableColumn="notes">NOTES <p-sortIcon field="notes"></p-sortIcon></th>
-                <th class="text-xs" pSortableColumn="supportRequests">SUPPORT <p-sortIcon field="supportRequests"></p-sortIcon></th>
+                <th class="text-xs" pSortableColumn="supportRequest">SUPPORT <p-sortIcon field="supportRequest"></p-sortIcon></th>
               </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-product>
-              <tr class="text-xs" [pSelectableRow]="product">
-                <td>{{product.id}}</td>
-                <td class="font-bold text-blue-600">{{product.info}}</td>
-                <td>{{product.salesOrder}}</td>
-                <td><p-tag [value]="product.invoices" [severity]="product.invoices === 'yes' ? 'success' : 'danger'"></p-tag></td>
-                <td><p-tag [value]="product.paymentHistory" [severity]="product.paymentHistory === 'yes' ? 'info' : 'warn'"></p-tag></td>
-                <td>{{product.communication}}</td>
-                <td>{{product.category}}</td>
-                <td>{{product.feedback}}</td>
-                <td>{{product.notes}}</td>
-                <td>{{product.supportRequests}}</td>
+            <ng-template pTemplate="body" let-customer>
+              <tr class="text-xs" [pSelectableRow]="customer">
+                <td>{{customer.id}}</td>
+                <td class="font-bold text-blue-600">{{customer.info}}</td>
+                <td>{{customer.salesOrders}}</td>
+                <td><p-tag [value]="customer.invoices" [severity]="customer.invoices === 'yes' ? 'success' : 'danger'"></p-tag></td>
+                <td><p-tag [value]="customer.paymentHistory" [severity]="customer.paymentHistory === 'yes' ? 'info' : 'warn'"></p-tag></td>
+                <td>{{customer.communication}}</td>
+                <td>{{customer.category}}</td>
+                <td>{{customer.feedback}}</td>
+                <td>{{customer.notes}}</td>
+                <td>{{customer.supportRequest}}</td>
               </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
@@ -133,7 +137,7 @@
                 icon="pi pi-trash"
                 severity="danger"
                 styleClass="w-full"
-                (onClick)="deleteProduct()">
+                (onClick)="deleteCustomer()">
               </p-button>
             </div>
           </div>
@@ -157,22 +161,22 @@
   <p-dialog [header]="getDialogHeader()" [(visible)]="displayDialog" [modal]="true" [style]="{width: '600px'}" styleClass="custom-dialog">
     <ng-template pTemplate="content">
       <div class="dialog-form-container">
-        <div class="field-row" [class.field-invalid]="submitted && !newProduct.info?.trim()">
+        <div class="field-row" [class.field-invalid]="submitted && !newCustomer.info?.trim()">
           <i class="pi pi-info-circle field-icon"></i>
           <label class="field-label">INFO *</label>
           <div class="field-input">
-            <input type="text" pInputText [(ngModel)]="newProduct.info" placeholder="Customer name or ID" class="w-full" />
-            <small *ngIf="submitted && !newProduct.info?.trim()" class="field-error">
+            <input type="text" pInputText [(ngModel)]="newCustomer.info" placeholder="Customer name or ID" class="w-full" />
+            <small *ngIf="submitted && !newCustomer.info?.trim()" class="field-error">
               <i class="pi pi-exclamation-circle"></i> Customer info is required
             </small>
           </div>
         </div>
-        <div class="field-row" [class.field-invalid]="submitted && !newProduct.salesOrder">
+        <div class="field-row" [class.field-invalid]="submitted && !newCustomer.salesOrders">
           <i class="pi pi-shopping-cart field-icon"></i>
           <label class="field-label">SALES ORDERS *</label>
           <div class="field-input">
-            <p-select [(ngModel)]="newProduct.salesOrder" [options]="orderOptions" optionLabel="label" optionValue="value" placeholder="Select order type" styleClass="w-full"></p-select>
-            <small *ngIf="submitted && !newProduct.salesOrder" class="field-error">
+            <p-select [(ngModel)]="newCustomer.salesOrders" [options]="orderOptions" optionLabel="label" optionValue="value" placeholder="Select order type" styleClass="w-full"></p-select>
+            <small *ngIf="submitted && !newCustomer.salesOrders" class="field-error">
               <i class="pi pi-exclamation-circle"></i> Please select an order type
             </small>
           </div>
@@ -181,35 +185,35 @@
           <i class="pi pi-file field-icon"></i>
           <label class="field-label">INVOICES</label>
           <div class="field-input">
-            <p-select [(ngModel)]="newProduct.invoices" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
+            <p-select [(ngModel)]="newCustomer.invoices" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-credit-card field-icon"></i>
           <label class="field-label">PAYMENT H.</label>
           <div class="field-input">
-            <p-select [(ngModel)]="newProduct.paymentHistory" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
+            <p-select [(ngModel)]="newCustomer.paymentHistory" [options]="yesNoOptions" optionLabel="label" optionValue="value" placeholder="Select" styleClass="w-full"></p-select>
           </div>
         </div>
         <div class="field-row" [class.field-invalid]="submitted && !isEmailValid()">
           <i class="pi pi-envelope field-icon"></i>
           <label class="field-label">EMAIL *</label>
           <div class="field-input">
-            <input type="email" pInputText [(ngModel)]="newProduct.communication" placeholder="customer@example.com" class="w-full" />
-            <small *ngIf="submitted && !newProduct.communication?.trim()" class="field-error">
+            <input type="email" pInputText [(ngModel)]="newCustomer.communication" placeholder="customer@example.com" class="w-full" />
+            <small *ngIf="submitted && !newCustomer.communication?.trim()" class="field-error">
               <i class="pi pi-exclamation-circle"></i> Email is required
             </small>
-            <small *ngIf="submitted && newProduct.communication?.trim() && !isValidEmailFormat()" class="field-error">
+            <small *ngIf="submitted && newCustomer.communication?.trim() && !isValidEmailFormat()" class="field-error">
               <i class="pi pi-exclamation-circle"></i> Please enter a valid email address
             </small>
           </div>
         </div>
-        <div class="field-row" [class.field-invalid]="submitted && !newProduct.category">
+        <div class="field-row" [class.field-invalid]="submitted && !newCustomer.category">
           <i class="pi pi-tag field-icon"></i>
           <label class="field-label">CATEGORY *</label>
           <div class="field-input">
-            <p-select [(ngModel)]="newProduct.category" [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" styleClass="w-full"></p-select>
-            <small *ngIf="submitted && !newProduct.category" class="field-error">
+            <p-select [(ngModel)]="newCustomer.category" [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" styleClass="w-full"></p-select>
+            <small *ngIf="submitted && !newCustomer.category" class="field-error">
               <i class="pi pi-exclamation-circle"></i> Please select a category
             </small>
           </div>
@@ -218,21 +222,21 @@
           <i class="pi pi-comment field-icon"></i>
           <label class="field-label">FEEDBACK</label>
           <div class="field-input">
-            <textarea pInputTextarea [(ngModel)]="newProduct.feedback" placeholder="Customer feedback" rows="2" class="w-full"></textarea>
+            <textarea pInputTextarea [(ngModel)]="newCustomer.feedback" placeholder="Customer feedback" rows="2" class="w-full"></textarea>
           </div>
         </div>
         <div class="field-row has-textarea">
           <i class="pi pi-pencil field-icon"></i>
           <label class="field-label">NOTES</label>
           <div class="field-input">
-            <textarea pInputTextarea [(ngModel)]="newProduct.notes" placeholder="Additional notes" rows="2" class="w-full"></textarea>
+            <textarea pInputTextarea [(ngModel)]="newCustomer.notes" placeholder="Additional notes" rows="2" class="w-full"></textarea>
           </div>
         </div>
         <div class="field-row">
           <i class="pi pi-question-circle field-icon"></i>
           <label class="field-label">SUPPORT</label>
           <div class="field-input">
-            <input type="text" pInputText [(ngModel)]="newProduct.supportRequests" placeholder="e.g. None, 1 pending" class="w-full" />
+            <input type="text" pInputText [(ngModel)]="newCustomer.supportRequest" placeholder="e.g. None, 1 pending" class="w-full" />
           </div>
         </div>
         <div class="text-xs text-500 mt-2">
@@ -243,7 +247,7 @@
     <ng-template pTemplate="footer">
       <div class="flex justify-content-end gap-2">
         <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="closeDialog()"></p-button>
-        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveProduct()"></p-button>
+        <p-button [label]="getSaveButtonLabel()" icon="pi pi-check" [severity]="isEditMode ? 'warn' : 'success'" (onClick)="saveCustomer()"></p-button>
       </div>
     </ng-template>
   </p-dialog>

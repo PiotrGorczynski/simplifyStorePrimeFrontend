@@ -6,7 +6,9 @@ import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
 import { DialogService } from 'primeng/dynamicdialog';
 import { loadingInterceptor } from './services/loading/loading.interceptor';
-import {provideHttpClient, withInterceptors} from '@angular/common/http';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,7 +16,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(
-      withInterceptors([loadingInterceptor])
+      withFetch(),
+      withInterceptors([jwtInterceptor, loadingInterceptor, errorInterceptor])
     ),
     providePrimeNG({
       theme: {
