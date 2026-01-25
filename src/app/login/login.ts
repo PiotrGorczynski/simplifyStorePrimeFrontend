@@ -7,8 +7,10 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 import { ThemeService } from '../services/theme.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +23,8 @@ import { ThemeService } from '../services/theme.service';
     PasswordModule,
     ButtonModule,
     ToastModule,
-    TooltipModule
+    TooltipModule,
+    ProgressSpinnerModule
   ],
   providers: [MessageService],
   templateUrl: './login.html',
@@ -32,15 +35,22 @@ export class LoginComponent implements OnInit {
   username = '';
   password = '';
   isDarkMode = false;
+  isLoading = false;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private messageService: MessageService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
@@ -55,31 +65,57 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.username === 'login' && this.password === 'password') {
-
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', this.username);
-      localStorage.setItem('loginTime', new Date().toISOString());
-
+    if (!this.username.trim() || !this.password.trim()) {
       this.messageService.add({
-        severity: 'success',
-        summary: 'Login Successful',
-        detail: `Welcome back, ${this.username}!`,
-        life: 2000
-      });
-
-      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-      setTimeout(() => {
-        this.router.navigate([returnUrl]);
-      }, 500);
-
-    } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Login Failed',
-        detail: 'Invalid username or password',
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: 'Please enter username and password',
         life: 3000
       });
+      return;
     }
+
+    this.isLoading = true;
+
+    this.authService.authenticate({
+      username: this.username,
+      password: this.password
+    }).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', this.username);
+        localStorage.setItem('loginTime', new Date().toISOString());
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Login Successful',
+          detail: `Welcome back, ${this.username}!`,
+          life: 2000
+        });
+
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+        setTimeout(() => {
+          this.router.navigate([returnUrl]);
+        }, 500);
+      },
+      error: (error) => {
+        this.isLoading = false;
+
+        let errorMessage = 'Invalid username or password';
+        if (error.status === 0) {
+          errorMessage = 'Unable to connect to server';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Login Failed',
+          detail: errorMessage,
+          life: 3000
+        });
+      }
+    });
   }
 }
