@@ -56,6 +56,11 @@ export class AuthService {
       tap(response => {
         this.setToken(response.token);
         this.isAuthenticatedSubject.next(true);
+        if (this.isBrowser) {
+          localStorage.setItem('username', data.username);
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('loginTime', new Date().toISOString());
+        }
       })
     );
   }

@@ -2,6 +2,10 @@
   <p-toast position="top-center"></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
+  <div *ngIf="isLoading" class="loading-overlay">
+    <p-progressSpinner strokeWidth="4" fill="transparent" animationDuration=".5s"></p-progressSpinner>
+  </div>
+
   <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
     <div class="grid align-items-stretch m-0 g-2">
 
@@ -26,9 +30,10 @@
           </div>
 
           <p-table
+            *ngIf="!isLoading"
             #dt
             [value]="deliveries"
-            [rows]="20"
+            [rows]="18"
             [paginator]="true"
             [globalFilterFields]="['deliveryType', 'status', 'provider', 'transactionId']"
             styleClass="p-datatable-sm p-datatable-striped"

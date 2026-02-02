@@ -30,6 +30,7 @@
           </div>
 
           <p-table
+            *ngIf="!isLoading"
             #dt
             [value]="customers"
             [rows]="18"

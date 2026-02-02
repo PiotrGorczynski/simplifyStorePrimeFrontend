@@ -14,19 +14,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ExportService } from '../../services/export.service';
 import { ThemeService } from '../../services/theme.service';
 import { ActionService, ActionType } from '../../services/action.service';
-
-interface DeliveryModel {
-  id: number;
-  deliveryType: string;
-  status: string;
-  provider: string;
-  transactionId: number;
-}
+import { DeliveryService, Delivery } from '../../services/delivery.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-delivery',
@@ -45,7 +40,8 @@ interface DeliveryModel {
     InputNumberModule,
     SelectModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    ProgressSpinnerModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './delivery.html',
@@ -53,18 +49,20 @@ interface DeliveryModel {
 })
 export class DeliveryComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
-  deliveries: DeliveryModel[] = [];
+  deliveries: Delivery[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
   selectedDeliveryId: number | null = null;
-  selectedDelivery: DeliveryModel | null = null;
+  selectedDelivery: Delivery | null = null;
   isDarkMode = false;
   submitted: boolean = false;
   searchValue: string = '';
+  isLoading = false;
 
   private actionSubscription: Subscription | null = null;
+  private loadingSubscription: Subscription | null = null;
 
-  newDelivery: Partial<DeliveryModel> = {
+  newDelivery: Partial<Delivery> = {
     deliveryType: '',
     status: '',
     provider: '',
@@ -107,32 +105,17 @@ export class DeliveryComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private exportService: ExportService,
     private themeService: ThemeService,
-    private actionService: ActionService
+    private actionService: ActionService,
+    private deliveryService: DeliveryService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.deliveries = [
-      { id: 1, deliveryType: 'express', status: 'delivered', provider: 'DHL', transactionId: 5 },
-      { id: 2, deliveryType: 'standard', status: 'in transit', provider: 'FedEx', transactionId: 12 },
-      { id: 3, deliveryType: 'in-store pickup', status: 'pending', provider: 'InPost', transactionId: 8 },
-      { id: 4, deliveryType: 'international', status: 'delivered', provider: 'DHL', transactionId: 3 },
-      { id: 5, deliveryType: 'express', status: 'out for delivery', provider: 'UPS', transactionId: 15 },
-      { id: 6, deliveryType: 'standard', status: 'delivered', provider: 'USPS', transactionId: 7 },
-      { id: 7, deliveryType: 'weekend delivery', status: 'in transit', provider: 'DPD', transactionId: 20 },
-      { id: 8, deliveryType: 'scheduled', status: 'pending', provider: 'Poczta Polska', transactionId: 11 },
-      { id: 9, deliveryType: 'express', status: 'failed', provider: 'FedEx', transactionId: 9 },
-      { id: 10, deliveryType: 'standard', status: 'delivered', provider: 'DHL', transactionId: 14 },
-      { id: 11, deliveryType: 'in-store pickup', status: 'delivered', provider: 'InPost', transactionId: 6 },
-      { id: 12, deliveryType: 'international', status: 'in transit', provider: 'DHL', transactionId: 18 },
-      { id: 13, deliveryType: 'express', status: 'cancelled', provider: 'UPS', transactionId: 2 },
-      { id: 14, deliveryType: 'standard', status: 'returned', provider: 'USPS', transactionId: 13 },
-      { id: 15, deliveryType: 'weekend delivery', status: 'delivered', provider: 'DPD', transactionId: 10 },
-      { id: 16, deliveryType: 'scheduled', status: 'in transit', provider: 'Amazon Logistics', transactionId: 16 },
-      { id: 17, deliveryType: 'express', status: 'out for delivery', provider: 'DHL', transactionId: 4 },
-      { id: 18, deliveryType: 'standard', status: 'pending', provider: 'FedEx', transactionId: 19 },
-      { id: 19, deliveryType: 'in-store pickup', status: 'delivered', provider: 'InPost', transactionId: 1 },
-      { id: 20, deliveryType: 'international', status: 'delivered', provider: 'DHL', transactionId: 17 }
-    ];
+    this.loadingSubscription = this.deliveryService.loading$.subscribe(
+      loading => this.isLoading = loading
+    );
+
+    this.loadDeliveries();
 
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
@@ -147,6 +130,26 @@ export class DeliveryComponent implements OnInit, OnDestroy {
     if (this.actionSubscription) {
       this.actionSubscription.unsubscribe();
     }
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
+  }
+
+  loadDeliveries(): void {
+    this.deliveryService.getAll().subscribe({
+      next: (data) => {
+        this.deliveries = data;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.message || 'Failed to load deliveries',
+          life: 5000
+        });
+        this.deliveries = [];
+      }
+    });
   }
 
   private handleAction(action: ActionType): void {
@@ -164,11 +167,13 @@ export class DeliveryComponent implements OnInit, OnDestroy {
         this.deleteDelivery();
         break;
       case 'exportPdf':
+        this.exportToPDF();
+        break;
       case 'exportExcel':
         this.exportToExcel();
         break;
       case 'grid':
-        this.exportToPDF();
+        this.exportToCSV();
         break;
       case 'code':
         this.exportToHTML();
@@ -245,33 +250,54 @@ export class DeliveryComponent implements OnInit, OnDestroy {
     }
 
     if (this.isEditMode && this.selectedDeliveryId) {
-      const index = this.deliveries.findIndex(d => d.id === this.selectedDeliveryId);
-      if (index !== -1) {
-        this.deliveries[index] = {
-          ...this.deliveries[index],
-          ...this.newDelivery
-        } as DeliveryModel;
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Delivery updated successfully',
-          life: 3000
-        });
-      }
+      this.deliveryService.update(this.selectedDeliveryId, this.newDelivery).subscribe({
+        next: (updatedDelivery) => {
+          const index = this.deliveries.findIndex(d => d.id === this.selectedDeliveryId);
+          if (index !== -1) {
+            this.deliveries[index] = updatedDelivery;
+            this.deliveries = [...this.deliveries];
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Updated',
+            detail: 'Delivery updated successfully',
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to update delivery',
+            life: 5000
+          });
+        }
+      });
     } else {
-      const nextId = this.deliveries.length > 0 ? Math.max(...this.deliveries.map(d => d.id)) + 1 : 1;
-      this.deliveries = [...this.deliveries, { ...this.newDelivery, id: nextId } as DeliveryModel];
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Created',
-        detail: `Delivery for Transaction #${this.newDelivery.transactionId} added successfully`,
-        life: 3000
+      this.deliveryService.create(this.newDelivery as Omit<Delivery, 'id'>).subscribe({
+        next: (createdDelivery) => {
+          this.deliveries = [...this.deliveries, createdDelivery];
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Created',
+            detail: `Delivery for Transaction #${createdDelivery.transactionId} added successfully`,
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to create delivery',
+            life: 5000
+          });
+        }
       });
     }
-    this.submitted = false;
-    this.displayDialog = false;
   }
 
   deleteDelivery() {
@@ -291,14 +317,26 @@ export class DeliveryComponent implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.deliveries = this.deliveries.filter(d => d.id !== this.selectedDelivery!.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: 'Delivery deleted successfully',
-          life: 3000
+        this.deliveryService.delete(this.selectedDelivery!.id).subscribe({
+          next: () => {
+            this.deliveries = this.deliveries.filter(d => d.id !== this.selectedDelivery!.id);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deleted',
+              detail: 'Delivery deleted successfully',
+              life: 3000
+            });
+            this.selectedDelivery = null;
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: error.message || 'Failed to delete delivery',
+              life: 5000
+            });
+          }
         });
-        this.selectedDelivery = null;
       }
     });
   }
@@ -364,11 +402,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
       header: 'Logout Confirmation',
       icon: 'pi pi-sign-out',
       accept: () => {
-        const username = localStorage.getItem('username') || 'User';
-
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('loginTime');
+        const username = this.authService.getUsername() || 'User';
 
         this.messageService.add({
           severity: 'info',
@@ -378,7 +412,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
         });
 
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.authService.logout();
         }, 500);
       },
       reject: () => {

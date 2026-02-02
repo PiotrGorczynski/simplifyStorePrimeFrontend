@@ -16,34 +16,19 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { DatePicker } from 'primeng/datepicker';
 import { RippleModule } from 'primeng/ripple';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ExportService } from '../../services/export.service';
 import { fadeInOut } from '../../../animations';
 import { ThemeService } from '../../services/theme.service';
 import { ActionType, ActionService } from '../../services/action.service';
 import { Subscription } from 'rxjs';
+import { TransactionService, Transaction, TransactionItem } from '../../services/transaction.service';
+import { AuthService } from '../../services/auth.service';
+import { CustomerService, Customer } from '../../services/customer.service';
+import { ProductService, Product } from '../../services/product.service';
 
-interface TransactionItemModel {
-  productId: number;
-  productName: string;
-  productCode: string;
-  quantity: number;
-  pricePerUnit: number;
-}
 
-interface TransactionModel {
-  id: number;
-  date: Date;
-  type: string;
-  total: number;
-  paymentMethod: string;
-  status: string;
-  provider: string;
-  customerId: number;
-  customerInfo: string;
-  employeeName: string;
-  items: TransactionItemModel[];
-}
 
 @Component({
   selector: 'app-transaction',
@@ -64,7 +49,8 @@ interface TransactionModel {
     ConfirmDialogModule,
     ToastModule,
     DatePicker,
-    RippleModule
+    RippleModule,
+    ProgressSpinnerModule
   ],
   providers: [ConfirmationService, MessageService],
   animations: [fadeInOut],
@@ -73,19 +59,22 @@ interface TransactionModel {
 })
 export class TransactionComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt!: Table;
-  transactions: TransactionModel[] = [];
+  transactions: Transaction[] = [];
   displayDialog: boolean = false;
   isEditMode: boolean = false;
   selectedTransactionId: number | null = null;
-  selectedTransaction: TransactionModel | null = null;
+  selectedTransaction: Transaction | null = null;
   isDarkMode = false;
   submitted: boolean = false;
   searchValue: string = '';
+  isLoading = false;
+
   private actionSubscription: Subscription | null = null;
+  private loadingSubscription: Subscription | null = null;
 
   expandedRowIds: Set<number> = new Set();
 
-  newTransaction: Partial<TransactionModel> = {
+  newTransaction: Partial<Transaction> = {
     date: new Date(),
     type: '',
     total: 0,
@@ -98,7 +87,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
     items: []
   };
 
-  currentItem: Partial<TransactionItemModel> = {
+  currentItem: Partial<TransactionItem> = {
     productId: undefined,
     quantity: 1
   };
@@ -129,24 +118,10 @@ export class TransactionComponent implements OnInit, OnDestroy {
     { label: 'Cancelled', value: 'cancelled' }
   ];
 
-  customerOptions = [
-    { label: 'Customer Alpha', value: 1, info: 'Customer Alpha' },
-    { label: 'Customer Beta', value: 2, info: 'Customer Beta' },
-    { label: 'Customer Gamma', value: 3, info: 'Customer Gamma' },
-    { label: 'Customer Delta', value: 4, info: 'Customer Delta' },
-    { label: 'Customer Epsilon', value: 5, info: 'Customer Epsilon' }
-  ];
+  customerOptions: { label: string; value: number; info: string }[] = [];
 
-  productOptions = [
-    { label: 'Laptop Pro 15 (LAP-001)', value: 1, name: 'Laptop Pro 15', code: 'LAP-001', price: 1299.99 },
-    { label: 'Wireless Mouse (MSE-002)', value: 2, name: 'Wireless Mouse', code: 'MSE-002', price: 29.99 },
-    { label: 'Office Chair (CHR-003)', value: 3, name: 'Office Chair', code: 'CHR-003', price: 249.99 },
-    { label: 'T-Shirt Cotton (TSH-004)', value: 4, name: 'T-Shirt Cotton', code: 'TSH-004', price: 19.99 },
-    { label: 'Notebook A4 (NTB-005)', value: 5, name: 'Notebook A4', code: 'NTB-005', price: 4.99 },
-    { label: 'Coffee Maker (COF-006)', value: 6, name: 'Coffee Maker', code: 'COF-006', price: 79.99 },
-    { label: 'Running Shoes (SHO-007)', value: 7, name: 'Running Shoes', code: 'SHO-007', price: 89.99 },
-    { label: 'Screwdriver Set (TOL-008)', value: 8, name: 'Screwdriver Set', code: 'TOL-008', price: 24.99 }
-  ];
+  productOptions: { label: string; value: number; name: string; code: string; price: number }[] = [];
+
 
   constructor(
     private router: Router,
@@ -154,165 +129,22 @@ export class TransactionComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private exportService: ExportService,
     private themeService: ThemeService,
-    private actionService: ActionService
+    private actionService: ActionService,
+    private transactionService: TransactionService,
+    private authService: AuthService,
+    private customerService: CustomerService,
+    private productService: ProductService
   ) {}
 
   ngOnInit() {
-    this.transactions = [
-      {
-        id: 1,
-        date: new Date('2024-01-15'),
-        type: 'sale',
-        total: 2749.93,
-        paymentMethod: 'credit card',
-        status: 'completed',
-        provider: 'Stripe',
-        customerId: 1,
-        customerInfo: 'Customer Alpha',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 1, productName: 'Laptop Pro 15', productCode: 'LAP-001', quantity: 2, pricePerUnit: 1299.99 },
-          { productId: 2, productName: 'Wireless Mouse', productCode: 'MSE-002', quantity: 5, pricePerUnit: 29.99 }
-        ]
-      },
-      {
-        id: 2,
-        date: new Date('2024-01-16'),
-        type: 'sale',
-        total: 249.99,
-        paymentMethod: 'cash',
-        status: 'completed',
-        provider: 'In-Store',
-        customerId: 2,
-        customerInfo: 'Customer Beta',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 3, productName: 'Office Chair', productCode: 'CHR-003', quantity: 1, pricePerUnit: 249.99 }
-        ]
-      },
-      {
-        id: 3,
-        date: new Date('2024-01-17'),
-        type: 'sale',
-        total: 224.91,
-        paymentMethod: 'BLIK',
-        status: 'pending',
-        provider: 'Payment Gateway',
-        customerId: 3,
-        customerInfo: 'Customer Gamma',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 4, productName: 'T-Shirt Cotton', productCode: 'TSH-004', quantity: 10, pricePerUnit: 19.99 },
-          { productId: 5, productName: 'Notebook A4', productCode: 'NTB-005', quantity: 5, pricePerUnit: 4.99 }
-        ]
-      },
-      {
-        id: 4,
-        date: new Date('2024-01-18'),
-        type: 'sale',
-        total: 79.99,
-        paymentMethod: 'debit card',
-        status: 'completed',
-        provider: 'Square',
-        customerId: 4,
-        customerInfo: 'Customer Delta',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 6, productName: 'Coffee Maker', productCode: 'COF-006', quantity: 1, pricePerUnit: 79.99 }
-        ]
-      },
-      {
-        id: 5,
-        date: new Date('2024-01-19'),
-        type: 'sale',
-        total: 539.88,
-        paymentMethod: 'credit card',
-        status: 'in transit',
-        provider: 'PayPal',
-        customerId: 5,
-        customerInfo: 'Customer Epsilon',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 7, productName: 'Running Shoes', productCode: 'SHO-007', quantity: 4, pricePerUnit: 89.99 },
-          { productId: 8, productName: 'Screwdriver Set', productCode: 'TOL-008', quantity: 6, pricePerUnit: 24.99 }
-        ]
-      },
-      {
-        id: 6,
-        date: new Date('2024-01-20'),
-        type: 'return',
-        total: -1299.99,
-        paymentMethod: 'credit card',
-        status: 'completed',
-        provider: 'Refund',
-        customerId: 1,
-        customerInfo: 'Customer Alpha',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 1, productName: 'Laptop Pro 15', productCode: 'LAP-001', quantity: 1, pricePerUnit: 1299.99 }
-        ]
-      },
-      {
-        id: 7,
-        date: new Date('2024-01-21'),
-        type: 'sale',
-        total: 149.95,
-        paymentMethod: 'bank transfer',
-        status: 'pending',
-        provider: 'Wire Transfer',
-        customerId: 2,
-        customerInfo: 'Customer Beta',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 2, productName: 'Wireless Mouse', productCode: 'MSE-002', quantity: 5, pricePerUnit: 29.99 }
-        ]
-      },
-      {
-        id: 8,
-        date: new Date('2024-01-22'),
-        type: 'sale',
-        total: 1299.99,
-        paymentMethod: 'PayPal',
-        status: 'completed',
-        provider: 'PayPal',
-        customerId: 3,
-        customerInfo: 'Customer Gamma',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 1, productName: 'Laptop Pro 15', productCode: 'LAP-001', quantity: 1, pricePerUnit: 1299.99 }
-        ]
-      },
-      {
-        id: 9,
-        date: new Date('2024-01-23'),
-        type: 'sale',
-        total: 499.98,
-        paymentMethod: 'cash',
-        status: 'completed',
-        provider: 'In-Store',
-        customerId: 4,
-        customerInfo: 'Customer Delta',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 3, productName: 'Office Chair', productCode: 'CHR-003', quantity: 2, pricePerUnit: 249.99 }
-        ]
-      },
-      {
-        id: 10,
-        date: new Date('2024-01-24'),
-        type: 'sale',
-        total: 359.92,
-        paymentMethod: 'BLIK',
-        status: 'new',
-        provider: 'Payment Gateway',
-        customerId: 5,
-        customerInfo: 'Customer Epsilon',
-        employeeName: 'Piotr',
-        items: [
-          { productId: 7, productName: 'Running Shoes', productCode: 'SHO-007', quantity: 4, pricePerUnit: 89.99 }
-        ]
-      }
-    ];
+    this.loadingSubscription = this.transactionService.loading$.subscribe(
+      loading => this.isLoading = loading
+    );
+
+    this.loadTransactions();
+    this.loadCustomers();
+    this.loadProducts();
+
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
     });
@@ -326,6 +158,26 @@ export class TransactionComponent implements OnInit, OnDestroy {
     if (this.actionSubscription) {
       this.actionSubscription.unsubscribe();
     }
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
+  }
+
+  loadTransactions(): void {
+    this.transactionService.getAll().subscribe({
+      next: (data) => {
+        this.transactions = data;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.message || 'Failed to load transactions',
+          life: 5000
+        });
+        this.transactions = [];
+      }
+    });
   }
 
   private handleAction(action: ActionType): void {
@@ -377,7 +229,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
     return this.isDarkMode ? 'logo-dark.png' : 'logo.png';
   }
 
-  toggleRow(transaction: TransactionModel) {
+  toggleRow(transaction: Transaction) {
     if (this.expandedRowIds.has(transaction.id)) {
       this.expandedRowIds.delete(transaction.id);
     } else {
@@ -385,7 +237,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
     }
   }
 
-  isRowExpanded(transaction: TransactionModel): boolean {
+  isRowExpanded(transaction: Transaction): boolean {
     return this.expandedRowIds.has(transaction.id);
   }
 
@@ -402,7 +254,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
       provider: '',
       customerId: undefined,
       customerInfo: '',
-      employeeName: 'Piotr',
+      employeeName: this.authService.getUsername() || 'User',
       items: []
     };
     this.displayDialog = true;
@@ -451,7 +303,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
     const product = this.productOptions.find(p => p.value === this.currentItem.productId);
     if (!product) return;
 
-    const item: TransactionItemModel = {
+    const item: TransactionItem = {
       productId: product.value,
       productName: product.name,
       productCode: product.code,
@@ -502,33 +354,54 @@ export class TransactionComponent implements OnInit, OnDestroy {
     }
 
     if (this.isEditMode && this.selectedTransactionId) {
-      const index = this.transactions.findIndex(t => t.id === this.selectedTransactionId);
-      if (index !== -1) {
-        this.transactions[index] = {
-          ...this.transactions[index],
-          ...this.newTransaction
-        } as TransactionModel;
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Transaction updated successfully',
-          life: 3000
-        });
-      }
+      this.transactionService.update(this.selectedTransactionId, this.newTransaction).subscribe({
+        next: (updatedTransaction) => {
+          const index = this.transactions.findIndex(t => t.id === this.selectedTransactionId);
+          if (index !== -1) {
+            this.transactions[index] = updatedTransaction;
+            this.transactions = [...this.transactions];
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Updated',
+            detail: 'Transaction updated successfully',
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to update transaction',
+            life: 5000
+          });
+        }
+      });
     } else {
-      const nextId = this.transactions.length > 0 ? Math.max(...this.transactions.map(t => t.id)) + 1 : 1;
-      this.transactions = [...this.transactions, { ...this.newTransaction, id: nextId } as TransactionModel];
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Created',
-        detail: `Transaction #${nextId} created successfully`,
-        life: 3000
+      this.transactionService.create(this.newTransaction as Omit<Transaction, 'id'>).subscribe({
+        next: (createdTransaction) => {
+          this.transactions = [...this.transactions, createdTransaction];
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Created',
+            detail: `Transaction #${createdTransaction.id} created successfully`,
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to create transaction',
+            life: 5000
+          });
+        }
       });
     }
-    this.submitted = false;
-    this.displayDialog = false;
   }
 
   deleteTransaction() {
@@ -548,15 +421,27 @@ export class TransactionComponent implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.transactions = this.transactions.filter(t => t.id !== this.selectedTransaction!.id);
-        this.expandedRowIds.delete(this.selectedTransaction!.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: 'Transaction deleted successfully',
-          life: 3000
+        this.transactionService.delete(this.selectedTransaction!.id).subscribe({
+          next: () => {
+            this.transactions = this.transactions.filter(t => t.id !== this.selectedTransaction!.id);
+            this.expandedRowIds.delete(this.selectedTransaction!.id);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deleted',
+              detail: 'Transaction deleted successfully',
+              life: 3000
+            });
+            this.selectedTransaction = null;
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: error.message || 'Failed to delete transaction',
+              life: 5000
+            });
+          }
         });
-        this.selectedTransaction = null;
       }
     });
   }
@@ -585,6 +470,8 @@ export class TransactionComponent implements OnInit, OnDestroy {
       this.newTransaction.customerId &&
       this.newTransaction.paymentMethod &&
       this.newTransaction.type &&
+      this.newTransaction.provider &&
+      this.newTransaction.provider.trim() !== '' &&
       this.newTransaction.items &&
       this.newTransaction.items.length > 0
     );
@@ -610,17 +497,45 @@ export class TransactionComponent implements OnInit, OnDestroy {
     }
   }
 
+  loadCustomers(): void {
+    this.customerService.getAll().subscribe({
+      next: (customers) => {
+        this.customerOptions = customers.map(c => ({
+          label: c.info,
+          value: c.id,
+          info: c.info
+        }));
+      },
+      error: (error) => {
+        console.error('Failed to load customers', error);
+      }
+    });
+  }
+
+  loadProducts(): void {
+    this.productService.getAll().subscribe({
+      next: (products) => {
+        this.productOptions = products.map(p => ({
+          label: `${p.name} (${p.code})`,
+          value: p.id,
+          name: p.name,
+          code: p.code,
+          price: p.price
+        }));
+      },
+      error: (error) => {
+        console.error('Failed to load products', error);
+      }
+    });
+  }
+
   onLogout(): void {
     this.confirmationService.confirm({
       message: 'Are you sure you want to logout?',
       header: 'Logout Confirmation',
       icon: 'pi pi-sign-out',
       accept: () => {
-        const username = localStorage.getItem('username') || 'User';
-
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('loginTime');
+        const username = this.authService.getUsername() || 'User';
 
         this.messageService.add({
           severity: 'info',
@@ -630,7 +545,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
         });
 
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.authService.logout();
         }, 500);
       },
       reject: () => {

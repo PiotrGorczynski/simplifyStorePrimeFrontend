@@ -14,24 +14,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { ExportService } from '../../services/export.service';
 import { ThemeService } from '../../services/theme.service';
 import { ActionService, ActionType } from '../../services/action.service';
-
-export interface Product {
-  id: number;
-  name: string;
-  code: string;
-  category: string;
-  price: number;
-  stock: number;
-  description: string;
-  notes: string;
-  minQuantity: number;
-  another: string;
-}
+import { ProductService, Product } from '../../services/product.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product',
@@ -50,7 +40,8 @@ export interface Product {
     InputNumberModule,
     SelectModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    ProgressSpinnerModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './product.html',
@@ -66,8 +57,10 @@ export class ProductComponent implements OnInit, OnDestroy {
   isDarkMode = false;
   submitted: boolean = false;
   searchValue: string = '';
+  isLoading = false;
 
   private actionSubscription: Subscription | null = null;
+  private loadingSubscription: Subscription | null = null;
 
   newProduct: Partial<Product> = {
     name: '',
@@ -98,252 +91,17 @@ export class ProductComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private exportService: ExportService,
     private themeService: ThemeService,
-    private actionService: ActionService
+    private actionService: ActionService,
+    private productService: ProductService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.products = [
-      {
-        id: 1,
-        name: 'Laptop Pro 15',
-        code: 'LAP-001',
-        category: 'electronics',
-        price: 1299.99,
-        stock: 45,
-        description: 'High-performance laptop with 16GB RAM',
-        notes: 'Popular item',
-        minQuantity: 1,
-        another: 'Warranty: 2 years'
-      },
-      {
-        id: 2,
-        name: 'Wireless Mouse',
-        code: 'MSE-002',
-        category: 'electronics',
-        price: 29.99,
-        stock: 150,
-        description: 'Ergonomic wireless mouse with USB receiver',
-        notes: 'Best seller',
-        minQuantity: 5,
-        another: 'Battery included'
-      },
-      {
-        id: 3,
-        name: 'Office Chair',
-        code: 'CHR-003',
-        category: 'furniture',
-        price: 249.99,
-        stock: 30,
-        description: 'Comfortable ergonomic office chair',
-        notes: 'Premium quality',
-        minQuantity: 1,
-        another: 'Adjustable height'
-      },
-      {
-        id: 4,
-        name: 'T-Shirt Cotton',
-        code: 'TSH-004',
-        category: 'clothing',
-        price: 19.99,
-        stock: 200,
-        description: '100% cotton t-shirt, various sizes',
-        notes: 'Summer collection',
-        minQuantity: 10,
-        another: 'Multiple colors'
-      },
-      {
-        id: 5,
-        name: 'Notebook A4',
-        code: 'NTB-005',
-        category: 'books',
-        price: 4.99,
-        stock: 500,
-        description: '200 pages ruled notebook',
-        notes: 'School supply',
-        minQuantity: 20,
-        another: 'Eco-friendly paper'
-      },
-      {
-        id: 6,
-        name: 'Coffee Maker',
-        code: 'COF-006',
-        category: 'electronics',
-        price: 79.99,
-        stock: 60,
-        description: 'Automatic drip coffee maker',
-        notes: 'Kitchen essential',
-        minQuantity: 2,
-        another: '12-cup capacity'
-      },
-      {
-        id: 7,
-        name: 'Running Shoes',
-        code: 'SHO-007',
-        category: 'sports',
-        price: 89.99,
-        stock: 80,
-        description: 'Professional running shoes',
-        notes: 'Top rated',
-        minQuantity: 5,
-        another: 'Breathable material'
-      },
-      {
-        id: 8,
-        name: 'Screwdriver Set',
-        code: 'TOL-008',
-        category: 'tools',
-        price: 24.99,
-        stock: 100,
-        description: '20-piece screwdriver set with case',
-        notes: 'Professional grade',
-        minQuantity: 3,
-        another: 'Magnetic tips'
-      },
-      {
-        id: 9,
-        name: 'Building Blocks',
-        code: 'TOY-009',
-        category: 'toys',
-        price: 34.99,
-        stock: 120,
-        description: '500-piece building blocks set',
-        notes: 'Ages 4+',
-        minQuantity: 5,
-        another: 'Educational toy'
-      },
-      {
-        id: 10,
-        name: 'Desk Lamp LED',
-        code: 'LMP-010',
-        category: 'electronics',
-        price: 39.99,
-        stock: 75,
-        description: 'Adjustable LED desk lamp',
-        notes: 'Energy efficient',
-        minQuantity: 2,
-        another: 'Touch control'
-      },
-      {
-        id: 11,
-        name: 'Backpack Travel',
-        code: 'BAG-011',
-        category: 'clothing',
-        price: 59.99,
-        stock: 90,
-        description: 'Durable travel backpack 40L',
-        notes: 'Water resistant',
-        minQuantity: 3,
-        another: 'Multiple compartments'
-      },
-      {
-        id: 12,
-        name: 'Protein Powder',
-        code: 'FOD-012',
-        category: 'food',
-        price: 49.99,
-        stock: 110,
-        description: 'Whey protein powder 2kg',
-        notes: 'Vanilla flavor',
-        minQuantity: 5,
-        another: 'High quality'
-      },
-      {
-        id: 13,
-        name: 'Yoga Mat',
-        code: 'SPT-013',
-        category: 'sports',
-        price: 29.99,
-        stock: 140,
-        description: 'Non-slip yoga mat with bag',
-        notes: 'Eco-friendly',
-        minQuantity: 5,
-        another: '6mm thickness'
-      },
-      {
-        id: 14,
-        name: 'Hammer Tool',
-        code: 'TOL-014',
-        category: 'tools',
-        price: 19.99,
-        stock: 85,
-        description: 'Claw hammer with rubber grip',
-        notes: 'Heavy duty',
-        minQuantity: 3,
-        another: 'Steel construction'
-      },
-      {
-        id: 15,
-        name: 'Board Game Classic',
-        code: 'TOY-015',
-        category: 'toys',
-        price: 24.99,
-        stock: 95,
-        description: 'Classic family board game',
-        notes: 'Ages 8+',
-        minQuantity: 3,
-        another: '2-6 players'
-      },
-      {
-        id: 16,
-        name: 'Cookbook Italian',
-        code: 'BOK-016',
-        category: 'books',
-        price: 29.99,
-        stock: 70,
-        description: 'Italian cuisine cookbook',
-        notes: 'Bestseller',
-        minQuantity: 2,
-        another: '200 recipes'
-      },
-      {
-        id: 17,
-        name: 'Bookshelf Wood',
-        code: 'FUR-017',
-        category: 'furniture',
-        price: 149.99,
-        stock: 25,
-        description: '5-tier wooden bookshelf',
-        notes: 'Assembly required',
-        minQuantity: 1,
-        another: 'Oak finish'
-      },
-      {
-        id: 18,
-        name: 'Headphones Wireless',
-        code: 'AUD-018',
-        category: 'electronics',
-        price: 129.99,
-        stock: 65,
-        description: 'Noise-cancelling wireless headphones',
-        notes: 'Premium sound',
-        minQuantity: 2,
-        another: '30h battery life'
-      },
-      {
-        id: 19,
-        name: 'Water Bottle Steel',
-        code: 'SPT-019',
-        category: 'sports',
-        price: 24.99,
-        stock: 180,
-        description: 'Insulated stainless steel bottle 1L',
-        notes: 'Keeps cold 24h',
-        minQuantity: 10,
-        another: 'BPA-free'
-      },
-      {
-        id: 20,
-        name: 'Jeans Denim',
-        code: 'CLO-020',
-        category: 'clothing',
-        price: 69.99,
-        stock: 130,
-        description: 'Classic fit denim jeans',
-        notes: 'All sizes available',
-        minQuantity: 5,
-        another: 'Stretch fabric'
-      }
-    ];
+    this.loadingSubscription = this.productService.loading$.subscribe(
+      loading => this.isLoading = loading
+    );
+
+    this.loadProducts();
 
     this.themeService.darkMode$.subscribe(isDark => {
       this.isDarkMode = isDark;
@@ -358,6 +116,26 @@ export class ProductComponent implements OnInit, OnDestroy {
     if (this.actionSubscription) {
       this.actionSubscription.unsubscribe();
     }
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
+  }
+
+  loadProducts(): void {
+    this.productService.getAll().subscribe({
+      next: (data) => {
+        this.products = data;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.message || 'Failed to load products',
+          life: 5000
+        });
+        this.products = [];
+      }
+    });
   }
 
   private handleAction(action: ActionType): void {
@@ -375,11 +153,13 @@ export class ProductComponent implements OnInit, OnDestroy {
         this.deleteProduct();
         break;
       case 'exportPdf':
+        this.exportToPDF();
+        break;
       case 'exportExcel':
         this.exportToExcel();
         break;
       case 'grid':
-        this.exportToPDF();
+        this.exportToCSV();
         break;
       case 'code':
         this.exportToHTML();
@@ -466,33 +246,54 @@ export class ProductComponent implements OnInit, OnDestroy {
     }
 
     if (this.isEditMode && this.selectedProductId) {
-      const index = this.products.findIndex(p => p.id === this.selectedProductId);
-      if (index !== -1) {
-        this.products[index] = {
-          ...this.products[index],
-          ...this.newProduct
-        } as Product;
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Product updated successfully',
-          life: 3000
-        });
-      }
+      this.productService.update(this.selectedProductId, this.newProduct).subscribe({
+        next: (updatedProduct) => {
+          const index = this.products.findIndex(p => p.id === this.selectedProductId);
+          if (index !== -1) {
+            this.products[index] = updatedProduct;
+            this.products = [...this.products];
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Updated',
+            detail: 'Product updated successfully',
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to update product',
+            life: 5000
+          });
+        }
+      });
     } else {
-      const nextId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
-      this.products = [...this.products, { ...this.newProduct, id: nextId } as Product];
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Created',
-        detail: `Product ${this.newProduct.name} added successfully`,
-        life: 3000
+      this.productService.create(this.newProduct as Omit<Product, 'id'>).subscribe({
+        next: (createdProduct) => {
+          this.products = [...this.products, createdProduct];
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Created',
+            detail: `Product ${createdProduct.name} added successfully`,
+            life: 3000
+          });
+          this.submitted = false;
+          this.displayDialog = false;
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.message || 'Failed to create product',
+            life: 5000
+          });
+        }
       });
     }
-    this.submitted = false;
-    this.displayDialog = false;
   }
 
   deleteProduct() {
@@ -512,14 +313,26 @@ export class ProductComponent implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.products = this.products.filter(p => p.id !== this.selectedProduct!.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: 'Product deleted successfully',
-          life: 3000
+        this.productService.delete(this.selectedProduct!.id).subscribe({
+          next: () => {
+            this.products = this.products.filter(p => p.id !== this.selectedProduct!.id);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deleted',
+              detail: 'Product deleted successfully',
+              life: 3000
+            });
+            this.selectedProduct = null;
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: error.message || 'Failed to delete product',
+              life: 5000
+            });
+          }
         });
-        this.selectedProduct = null;
       }
     });
   }
@@ -576,11 +389,7 @@ export class ProductComponent implements OnInit, OnDestroy {
       header: 'Logout Confirmation',
       icon: 'pi pi-sign-out',
       accept: () => {
-        const username = localStorage.getItem('username') || 'User';
-
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('loginTime');
+        const username = this.authService.getUsername() || 'User';
 
         this.messageService.add({
           severity: 'info',
@@ -590,7 +399,7 @@ export class ProductComponent implements OnInit, OnDestroy {
         });
 
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.authService.logout();
         }, 500);
       },
       reject: () => {

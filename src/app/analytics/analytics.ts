@@ -47,96 +47,6 @@ export class AnalyticsComponent implements OnInit {
   private statusChart?: Chart;
   private topProductsChart?: Chart;
 
-  mockTransactions = [
-    {
-      id: 1, date: new Date('2024-01-15'), type: 'sale', total: 2749.93,
-      paymentMethod: 'credit card', status: 'completed', provider: 'Stripe',
-      customerId: 1, customerInfo: 'Customer Alpha', employeeName: 'Piotr',
-      items: [
-        { productId: 1, productName: 'Laptop Pro 15', productCode: 'LAP-001', quantity: 2, pricePerUnit: 1299.99 },
-        { productId: 2, productName: 'Wireless Mouse', productCode: 'MSE-002', quantity: 5, pricePerUnit: 29.99 }
-      ]
-    },
-    {
-      id: 2, date: new Date('2024-01-16'), type: 'sale', total: 249.99,
-      paymentMethod: 'cash', status: 'completed', provider: 'In-Store',
-      customerId: 2, customerInfo: 'Customer Beta', employeeName: 'Piotr',
-      items: [
-        { productId: 3, productName: 'Office Chair', productCode: 'CHR-003', quantity: 1, pricePerUnit: 249.99 }
-      ]
-    },
-    {
-      id: 3, date: new Date('2024-01-17'), type: 'sale', total: 224.91,
-      paymentMethod: 'BLIK', status: 'pending', provider: 'Payment Gateway',
-      customerId: 3, customerInfo: 'Customer Gamma', employeeName: 'Piotr',
-      items: [
-        { productId: 4, productName: 'T-Shirt Cotton', productCode: 'TSH-004', quantity: 10, pricePerUnit: 19.99 },
-        { productId: 5, productName: 'Notebook A4', productCode: 'NTB-005', quantity: 5, pricePerUnit: 4.99 }
-      ]
-    },
-    {
-      id: 4, date: new Date('2024-01-18'), type: 'sale', total: 79.99,
-      paymentMethod: 'debit card', status: 'completed', provider: 'Square',
-      customerId: 4, customerInfo: 'Customer Delta', employeeName: 'Piotr',
-      items: [
-        { productId: 6, productName: 'Coffee Maker', productCode: 'COF-006', quantity: 1, pricePerUnit: 79.99 }
-      ]
-    },
-    {
-      id: 5, date: new Date('2024-01-19'), type: 'sale', total: 539.88,
-      paymentMethod: 'credit card', status: 'in transit', provider: 'PayPal',
-      customerId: 5, customerInfo: 'Customer Epsilon', employeeName: 'Piotr',
-      items: [
-        { productId: 7, productName: 'Running Shoes', productCode: 'SHO-007', quantity: 4, pricePerUnit: 89.99 },
-        { productId: 8, productName: 'Screwdriver Set', productCode: 'TOL-008', quantity: 6, pricePerUnit: 24.99 }
-      ]
-    },
-    {
-      id: 6, date: new Date('2024-01-20'), type: 'return', total: -1299.99,
-      paymentMethod: 'credit card', status: 'completed', provider: 'Refund',
-      customerId: 1, customerInfo: 'Customer Alpha', employeeName: 'Piotr',
-      items: [
-        { productId: 1, productName: 'Laptop Pro 15', productCode: 'LAP-001', quantity: 1, pricePerUnit: 1299.99 }
-      ]
-    },
-    {
-      id: 7, date: new Date('2024-01-21'), type: 'sale', total: 149.95,
-      paymentMethod: 'bank transfer', status: 'pending', provider: 'Wire Transfer',
-      customerId: 2, customerInfo: 'Customer Beta', employeeName: 'Piotr',
-      items: [
-        { productId: 2, productName: 'Wireless Mouse', productCode: 'MSE-002', quantity: 5, pricePerUnit: 29.99 }
-      ]
-    },
-    {
-      id: 8, date: new Date('2024-01-22'), type: 'sale', total: 1299.99,
-      paymentMethod: 'PayPal', status: 'completed', provider: 'PayPal',
-      customerId: 3, customerInfo: 'Customer Gamma', employeeName: 'Piotr',
-      items: [
-        { productId: 1, productName: 'Laptop Pro 15', productCode: 'LAP-001', quantity: 1, pricePerUnit: 1299.99 }
-      ]
-    },
-    {
-      id: 9, date: new Date('2024-01-23'), type: 'sale', total: 499.98,
-      paymentMethod: 'cash', status: 'completed', provider: 'In-Store',
-      customerId: 4, customerInfo: 'Customer Delta', employeeName: 'Piotr',
-      items: [
-        { productId: 3, productName: 'Office Chair', productCode: 'CHR-003', quantity: 2, pricePerUnit: 249.99 }
-      ]
-    },
-    {
-      id: 10, date: new Date('2024-01-24'), type: 'sale', total: 359.92,
-      paymentMethod: 'BLIK', status: 'new', provider: 'Payment Gateway',
-      customerId: 5, customerInfo: 'Customer Epsilon', employeeName: 'Piotr',
-      items: [
-        { productId: 7, productName: 'Running Shoes', productCode: 'SHO-007', quantity: 4, pricePerUnit: 89.99 }
-      ]
-    }
-  ];
-
-  mockCustomers = Array(20).fill(null).map((_, i) => ({ id: i + 1 }));
-  mockProducts = Array(20).fill(null).map((_, i) => ({ id: i + 1 }));
-  mockDeliveries = Array(20).fill(null).map((_, i) => ({ id: i + 1 }));
-
   constructor(
     private analyticsService: AnalyticsService,
     private messageService: MessageService,
@@ -158,19 +68,9 @@ export class AnalyticsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    setTimeout(() => {
-      try {
-        if (this.mockTransactions.length === 0) {
-          throw new Error('No transactions available for analytics');
-        }
-
-        this.analyticsData = this.analyticsService.generateAnalytics(
-          this.mockTransactions,
-          this.mockCustomers,
-          this.mockProducts,
-          this.mockDeliveries
-        );
-
+    this.analyticsService.getSummary().subscribe({
+      next: (summary) => {
+        this.analyticsData = this.analyticsService.transformToAnalyticsData(summary);
         this.isLoading = false;
 
         setTimeout(() => {
@@ -183,8 +83,8 @@ export class AnalyticsComponent implements OnInit {
           detail: 'Analytics data loaded successfully',
           life: 2000
         });
-
-      } catch (error: any) {
+      },
+      error: (error) => {
         this.isLoading = false;
         this.errorMessage = error.message || 'Failed to load analytics';
 
@@ -195,7 +95,7 @@ export class AnalyticsComponent implements OnInit {
           life: 3000
         });
       }
-    }, 800);
+    });
   }
 
   private getChartColors() {

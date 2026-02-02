@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
@@ -9,6 +10,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ThemeService } from '../../services/theme.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-sign-up',
@@ -44,7 +46,8 @@ export class SignUpComponent implements OnInit {
   constructor(
     private router: Router,
     private messageService: MessageService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -97,19 +100,32 @@ export class SignUpComponent implements OnInit {
 
     this.isLoading = true;
 
-    setTimeout(() => {
-      this.isLoading = false;
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Account Created!',
-        detail: `Welcome to Simplify Store Prime, ${this.username}!`,
-        life: 4000
-      });
-
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 2000);
-    }, 1500);
+    this.http.post(`${environment.apiUrl}/auth/register`, {
+      username: this.username,
+      email: this.email,
+      password: this.password
+    }).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Account Created!',
+          detail: `Welcome ${this.username}! Please log in.`,
+          life: 4000
+        });
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Registration Failed',
+          detail: error.error?.message || 'Could not create account. Username may already exist.',
+          life: 5000
+        });
+      }
+    });
   }
 }

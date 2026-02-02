@@ -13,6 +13,7 @@ import { InfoDialogService } from '../../../services/info-dialog';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -48,11 +49,12 @@ export class SidebarComponent implements OnInit {
     private messageService: MessageService,
     private themeService: ThemeService,
     private infoDialogService: InfoDialogService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.username = localStorage.getItem('username') || 'User';
+    this.username = this.authService.getUsername() || localStorage.getItem('username') || 'User';
     const loginTimeStr = localStorage.getItem('loginTime');
     if (loginTimeStr) {
       const date = new Date(loginTimeStr);
@@ -135,20 +137,15 @@ export class SidebarComponent implements OnInit {
         icon: 'pi pi-chart-bar',
         routerLink: '/analytics',
         command: () => this.onMenuClick()
+      },
+      { separator: true },
+      {
+        label: 'Logout',
+        icon: 'pi pi-sign-out',
+        styleClass: 'logout-menu-item',
+        command: () => this.confirmLogout()
       }
     ];
-
-    if (this.isAnalyticsPage) {
-      this.items.push(
-        { separator: true },
-        {
-          label: 'Logout',
-          icon: 'pi pi-sign-out',
-          styleClass: 'logout-menu-item',
-          command: () => this.confirmLogout()
-        }
-      );
-    }
   }
 
   onMenuClick(): void {
@@ -172,15 +169,8 @@ export class SidebarComponent implements OnInit {
       rejectLabel: 'Cancel',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.logout();
+        this.authService.logout();
       }
     });
-  }
-
-  logout(): void {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('username');
-    localStorage.removeItem('loginTime');
-    this.router.navigate(['/login']);
   }
 }

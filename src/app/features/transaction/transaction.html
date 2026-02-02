@@ -2,6 +2,10 @@
   <p-toast position="top-center"></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
+  <div *ngIf="isLoading" class="loading-overlay">
+    <p-progressSpinner strokeWidth="4" fill="transparent" animationDuration=".5s"></p-progressSpinner>
+  </div>
+
   <div class="dashboard-container pt-6 p-2 pl-0 flex-grow-1 overflow-auto">
     <div class="grid align-items-stretch m-0 g-2">
 
@@ -26,9 +30,10 @@
           </div>
 
           <p-table
+            *ngIf="!isLoading"
             #dt
             [value]="transactions"
-            [rows]="18"
+            [rows]="10"
             [paginator]="true"
             [globalFilterFields]="['customerInfo', 'type', 'paymentMethod', 'status', 'provider', 'employeeName']"
             class="p-datatable-sm p-datatable-striped"
@@ -315,7 +320,7 @@
           <div class="col-6">
             <div class="field-row">
               <i class="pi pi-building field-icon"></i>
-              <label class="field-label">PROVIDER</label>
+              <label class="field-label">PROVIDER *</label>
               <div class="field-input">
                 <input type="text" pInputText [(ngModel)]="newTransaction.provider" placeholder="Payment provider" class="w-full" />
               </div>

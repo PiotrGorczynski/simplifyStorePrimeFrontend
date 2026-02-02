@@ -6,16 +6,18 @@ import { SidebarComponent } from '../sidebar/sidebar';
 import { ThemeService } from '../../../services/theme.service';
 import { ActionService } from '../../../services/action.service';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import { filter } from 'rxjs/operators';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import {AuthService} from '../../../services/auth.service';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, SidebarComponent, ButtonModule, ToastModule],
+  imports: [RouterOutlet, CommonModule, SidebarComponent, ButtonModule, ToastModule, ConfirmDialogModule],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class MainLayoutComponent implements OnInit {
   sidebarVisible = false;
@@ -33,7 +35,10 @@ export class MainLayoutComponent implements OnInit {
   constructor(
     private themeService: ThemeService,
     private actionService: ActionService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -138,8 +143,25 @@ export class MainLayoutComponent implements OnInit {
 
   emitAction(action: string): void {
     console.log('Emitting action:', action);
+
+    if (action === 'logout') {
+      this.onLogout();
+      return;
+    }
+
     this.actionService.emitAction(action);
     this.closeActionPanel();
+  }
+
+  onLogout(): void {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to logout?',
+      header: 'Confirm Logout',
+      icon: 'pi pi-sign-out',
+      accept: () => {
+        this.authService.logout();
+      }
+    });
   }
 
   getLogoPath(): string {
