@@ -10,12 +10,15 @@ import { ForgotPasswordComponent } from './login/forgot-password/forgot-password
 import { SignUpComponent } from './login/sign-up/sign-up';
 import { MainLayoutComponent } from './components/layout/main-layout/main-layout';
 import { NotFoundComponent } from './not-found/not-found';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'sign-up', component: SignUpComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   {
     path: '',
     component: MainLayoutComponent,

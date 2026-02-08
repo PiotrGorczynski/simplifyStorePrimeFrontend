@@ -8,6 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ThemeService } from '../../services/theme.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -29,12 +30,14 @@ export class ForgotPasswordComponent implements OnInit {
   email = '';
   emailTouched = false;
   isLoading = false;
+  isSubmitted = false;
   isDarkMode = false;
 
   constructor(
     private router: Router,
     private messageService: MessageService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -57,26 +60,41 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.emailTouched = true;
+
     if (!this.isValidEmail()) {
-      this.emailTouched = true;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please enter a valid email address',
+        life: 3000
+      });
       return;
     }
 
     this.isLoading = true;
 
-    setTimeout(() => {
-      this.isLoading = false;
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Reset Link Sent!',
-        detail: `Password reset instructions have been sent to ${this.email}`,
-        life: 4000
-      });
-
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 2000);
-    }, 1500);
+    this.authService.forgotPassword(this.email).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.isSubmitted = true;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Email Sent!',
+          detail: response.message || 'Check your inbox for the reset link.',
+          life: 5000
+        });
+      },
+      error: () => {
+        this.isLoading = false;
+        this.isSubmitted = true;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Email Sent!',
+          detail: 'If an account with that email exists, a reset link has been sent.',
+          life: 5000
+        });
+      }
+    });
   }
 }
