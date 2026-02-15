@@ -244,6 +244,8 @@
                   optionLabel="label"
                   optionValue="value"
                   placeholder="Select customer"
+                  [panelStyle]="{'max-width': '280px'}"
+                  appendTo="body"
                   class="w-full">
                 </p-select>
                 <small *ngIf="submitted && !newTransaction.customerId" class="field-error">
