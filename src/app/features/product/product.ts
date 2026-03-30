@@ -93,7 +93,7 @@ export class ProductComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private actionService: ActionService,
     private productService: ProductService,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
 
   ngOnInit() {

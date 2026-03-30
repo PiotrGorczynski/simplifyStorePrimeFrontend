@@ -36,7 +36,7 @@ export class MainLayoutComponent implements OnInit {
     private themeService: ThemeService,
     private actionService: ActionService,
     private router: Router,
-    private authService: AuthService,
+    public authService: AuthService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}

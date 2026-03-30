@@ -107,7 +107,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private actionService: ActionService,
     private customerService: CustomerService,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
 
   ngOnInit() {

@@ -130,6 +130,8 @@
                 icon="pi pi-plus"
                 severity="success"
                 styleClass="w-full"
+                [disabled]="!authService.isAdmin()"
+                [pTooltip]="!authService.isAdmin() ? 'Admin access required' : ''"
                 (onClick)="showDialog()">
               </p-button>
 
@@ -138,6 +140,8 @@
                 icon="pi pi-refresh"
                 severity="warn"
                 styleClass="w-full"
+                [disabled]="!authService.isAdmin()"
+                [pTooltip]="!authService.isAdmin() ? 'Admin access required' : ''"
                 (onClick)="showUpdateDialog()">
               </p-button>
 
@@ -146,6 +150,8 @@
                 icon="pi pi-trash"
                 severity="danger"
                 styleClass="w-full"
+                [disabled]="!authService.isAdmin()"
+                [pTooltip]="!authService.isAdmin() ? 'Admin access required' : ''"
                 (onClick)="deleteProduct()">
               </p-button>
             </div>

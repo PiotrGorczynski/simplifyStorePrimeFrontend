@@ -46,15 +46,15 @@
           <i class="pi pi-eye"></i>
           <span>SHOW</span>
         </button>
-        <button pButton class="p-button-rounded p-button-success" (click)="emitAction('insert')">
+        <button pButton class="p-button-rounded p-button-success" [disabled]="!authService.isAdmin()" (click)="emitAction('insert')">
           <i class="pi pi-plus"></i>
           <span>INSERT</span>
         </button>
-        <button pButton class="p-button-rounded p-button-warning" (click)="emitAction('update')">
+        <button pButton class="p-button-rounded p-button-warning" [disabled]="!authService.isAdmin()" (click)="emitAction('update')">
           <i class="pi pi-refresh"></i>
           <span>UPDATE</span>
         </button>
-        <button pButton class="p-button-rounded p-button-danger" (click)="emitAction('delete')">
+        <button pButton class="p-button-rounded p-button-danger" [disabled]="!authService.isAdmin()" (click)="emitAction('delete')">
           <i class="pi pi-trash"></i>
           <span>DELETE</span>
         </button>

@@ -131,7 +131,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private actionService: ActionService,
     private transactionService: TransactionService,
-    private authService: AuthService,
+    public authService: AuthService,
     private customerService: CustomerService,
     private productService: ProductService
   ) {}

@@ -50,7 +50,7 @@ export class SidebarComponent implements OnInit {
     private themeService: ThemeService,
     private infoDialogService: InfoDialogService,
     private confirmationService: ConfirmationService,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
 
   ngOnInit() {

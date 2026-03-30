@@ -23,10 +23,11 @@ export interface Customer {
 export class CustomerService {
   private apiUrl = `${environment.apiUrl}/customers`;
 
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-  public loading$ = this.loadingSubject.asObservable();
-
   constructor(private http: HttpClient) {}
+
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+
+  public loading$ = this.loadingSubject.asObservable();
 
   private setLoading(loading: boolean): void {
     this.loadingSubject.next(loading);

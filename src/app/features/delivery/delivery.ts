@@ -107,7 +107,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private actionService: ActionService,
     private deliveryService: DeliveryService,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
 
   ngOnInit() {

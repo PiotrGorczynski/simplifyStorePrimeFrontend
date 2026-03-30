@@ -19,7 +19,9 @@
       </div>
       <div class="mt-2">
         <span class="font-bold text-xl block text-900">Welcome, {{username}}!</span>
-        <span class="text-xs text-500 font-medium uppercase">Administrator</span>
+        <span class="text-xs text-500 font-medium uppercase">
+          {{ authService.isAdmin() ? 'Administrator' : 'User' }}
+        </span>
         <div class="text-xs text-500 mt-1" *ngIf="loginTime">
           <i class="pi pi-sign-in mr-1"></i>
           Logged in at {{loginTime}}
