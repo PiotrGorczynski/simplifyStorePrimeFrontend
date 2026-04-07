@@ -203,24 +203,24 @@
       </div>
 
       <div class="grid mb-4">
-        <div class="col-12 lg:col-8">
+        <div class="col-12 lg:col-6">
           <p-card class="chart-card">
             <ng-template pTemplate="header">
               <div class="chart-header">
-                <span class="chart-title">Transaction Trends</span>
+                <span class="chart-title">Delivery Types</span>
                 <i class="pi pi-info-circle"
-                   pTooltip="Daily transaction count and revenue for the last 7 days"
+                   pTooltip="Distribution of delivery types used in shipments"
                    tooltipPosition="left">
                 </i>
               </div>
             </ng-template>
-            <div class="chart-container-large">
-              <canvas #transactionsByDateChart></canvas>
+            <div class="chart-container">
+              <canvas #deliveryTypesChart></canvas>
             </div>
           </p-card>
         </div>
 
-        <div class="col-12 lg:col-4">
+        <div class="col-12 lg:col-6">
           <p-card class="chart-card">
             <ng-template pTemplate="header">
               <div class="chart-header">
@@ -233,6 +233,25 @@
             </ng-template>
             <div class="chart-container">
               <canvas #topProductsChart></canvas>
+            </div>
+          </p-card>
+        </div>
+      </div>
+
+      <div class="grid mb-4">
+        <div class="col-12">
+          <p-card class="chart-card">
+            <ng-template pTemplate="header">
+              <div class="chart-header">
+                <span class="chart-title">Transaction Trends</span>
+                <i class="pi pi-info-circle"
+                   pTooltip="Daily transaction count and revenue for the last 7 days"
+                   tooltipPosition="left">
+                </i>
+              </div>
+            </ng-template>
+            <div class="chart-container-large">
+              <canvas #transactionsByDateChart></canvas>
             </div>
           </p-card>
         </div>

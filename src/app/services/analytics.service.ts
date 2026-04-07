@@ -23,6 +23,7 @@ export interface AnalyticsSummary {
   transactionStatusDistribution: { [key: string]: number };
   topProducts: ProductRevenue[];
   dailyTransactions: DailyTransaction[];
+  deliveryTypeDistribution: { [key: string]: number };
 }
 
 export interface AnalyticsData {
@@ -35,6 +36,7 @@ export interface AnalyticsData {
   transactionsByStatus: { status: string; count: number }[];
   transactionsByDate: { date: string; count: number; amount: number }[];
   topProducts: { name: string; quantity: number; revenue: number }[];
+  deliveryTypes: { type: string; count: number }[];
 }
 
 @Injectable({
@@ -73,6 +75,9 @@ export class AnalyticsService {
       revenue: tp.revenue
     }));
 
+    const deliveryTypes = Object.entries(summary.deliveryTypeDistribution || {})
+      .map(([type, count]) => ({ type, count: count as number }));
+
     return {
       totalSales: summary.totalSales || 0,
       totalCustomers: summary.totalCustomers || 0,
@@ -82,7 +87,8 @@ export class AnalyticsService {
       paymentMethods,
       transactionsByStatus,
       transactionsByDate,
-      topProducts
+      topProducts,
+      deliveryTypes
     };
   }
 
@@ -96,7 +102,8 @@ export class AnalyticsService {
       paymentMethods: [],
       transactionsByStatus: [],
       transactionsByDate: [],
-      topProducts: []
+      topProducts: [],
+      deliveryTypes: []
     };
   }
 }

@@ -36,6 +36,7 @@ export class AnalyticsComponent implements OnInit {
   @ViewChild('transactionsByDateChart') transactionsByDateChartRef!: ElementRef;
   @ViewChild('statusChart') statusChartRef!: ElementRef;
   @ViewChild('topProductsChart') topProductsChartRef!: ElementRef;
+  @ViewChild('deliveryTypesChart') deliveryTypesChartRef!: ElementRef;
 
   analyticsData: AnalyticsData | null = null;
   isLoading = true;
@@ -46,6 +47,7 @@ export class AnalyticsComponent implements OnInit {
   private transactionsByDateChart?: Chart;
   private statusChart?: Chart;
   private topProductsChart?: Chart;
+  private deliveryTypesChart?: Chart;
 
   constructor(
     private analyticsService: AnalyticsService,
@@ -113,6 +115,7 @@ export class AnalyticsComponent implements OnInit {
     this.createTransactionsByDateChart();
     this.createStatusChart();
     this.createTopProductsChart();
+    this.createDeliveryTypesChart();
   }
 
   createPaymentMethodsChart(): void {
@@ -373,6 +376,68 @@ export class AnalyticsComponent implements OnInit {
     });
   }
 
+  createDeliveryTypesChart(): void {
+    if (!this.deliveryTypesChartRef) return;
+
+    const canvas = this.deliveryTypesChartRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+
+    if (this.deliveryTypesChart) {
+      this.deliveryTypesChart.destroy();
+    }
+
+    const data = this.analyticsData!.deliveryTypes;
+    const labels = data.map((d: any) => d.type);
+    const values = data.map((d: any) => d.count);
+    const colors = this.getChartColors();
+
+    this.deliveryTypesChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: [
+            '#7c4dff',
+            '#4a148c',
+            '#b39ddb',
+            '#9575cd',
+            '#673ab7',
+            '#5e35b1',
+            '#512da8'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: colors.text }
+          },
+          title: {
+            display: true,
+            text: 'Share of Delivery Types',
+            font: { size: 16, weight: 'bold' },
+            color: colors.title
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context: any) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} deliveries (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   refreshData(): void {
     this.loadAnalytics();
   }
@@ -450,6 +515,30 @@ export class AnalyticsComponent implements OnInit {
         return [
           ts.status.charAt(0).toUpperCase() + ts.status.slice(1),
           ts.count.toString(),
+          `${percentage}%`
+        ];
+      }),
+      headStyles: { fillColor: [124, 77, 255], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 255] },
+      styles: { fontSize: 10 }
+    });
+
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+    if (currentY > 220) { doc.addPage(); currentY = 20; }
+
+    doc.setFontSize(14);
+    doc.setTextColor(74, 20, 140);
+    doc.text('Delivery Types', 14, currentY);
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [['Delivery Type', 'Count', 'Percentage']],
+      body: this.analyticsData.deliveryTypes.map((dt: any) => {
+        const total = this.analyticsData!.deliveryTypes.reduce((sum: number, item: any) => sum + item.count, 0);
+        const percentage = ((dt.count / total) * 100).toFixed(1);
+        return [
+          dt.type.charAt(0).toUpperCase() + dt.type.slice(1),
+          dt.count.toString(),
           `${percentage}%`
         ];
       }),
