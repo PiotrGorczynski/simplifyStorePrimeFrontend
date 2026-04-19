@@ -36,7 +36,7 @@ export class InfoAboutAppComponent {
   ];
 
   techStack: TechItem[] = [
-    { name: 'Angular 19', category: 'Frontend' },
+    { name: 'Angular 21', category: 'Frontend' },
     { name: 'PrimeNG', category: 'Frontend' },
     { name: 'Spring Boot', category: 'Backend' },
     { name: 'PostgreSQL', category: 'Database' }
